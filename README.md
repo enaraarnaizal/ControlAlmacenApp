@@ -18,3 +18,5 @@ Aplicación Android (Tablet) para gestionar inventario de un almacén (sin servi
 - Estructura inicial del código (MVC)
 
 ## LINKS
+
+[![Abrir en Figma](https://img.shields.io/badge/Abrir_en-Figma-blue?logo=figma)](https://www.figma.com/make/N8KyadhP248zclhwFIBMf3/Tablet-format-mockup?p=f&t=hAddy6BxYTXOF53I-0&fullscreen=1)
