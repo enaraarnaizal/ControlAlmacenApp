@@ -1,6 +1,4 @@
-# ControlAlmacenApp
-
-# Control de Almacén (App Tablet)
+# ControlAlmacenApp (App Tablet)
 
 Aplicación Android (Tablet) para gestionar inventario de un almacén (sin servidor), con base de datos local (Room/SQLite).
 
