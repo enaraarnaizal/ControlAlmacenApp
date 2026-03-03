@@ -16,3 +16,5 @@ Aplicación Android (Tablet) para gestionar inventario de un almacén (sin servi
 - Configuración inicial Room
 - Mockups pantallas principales
 - Estructura inicial del código (MVC)
+
+## LINKS
