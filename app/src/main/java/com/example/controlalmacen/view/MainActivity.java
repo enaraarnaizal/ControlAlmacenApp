@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         rvPerfiles = findViewById(R.id.rvPerfiles);
 
         // Grid para tablet (4 columnas, ajusta si quieres)
-        rvPerfiles.setLayoutManager(new GridLayoutManager(this, 4));
+        rvPerfiles.setLayoutManager(new GridLayoutManager(this, 3));
 
         cargarPerfiles();
     }
@@ -44,11 +44,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hacerLogin(Usuario u) {
-        // En Sprint 2 el login es seleccionar perfil :contentReference[oaicite:2]{index=2}
-        // Guardamos “sesión” y pasamos a la pantalla Diario (la creamos ahora)
         Sesion.setUsuario(u);
-        Sesion.touch(); // marca última actividad
-
         startActivity(new Intent(this, DiarioActivity.class));
         finish();
     }
