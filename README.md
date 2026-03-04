@@ -1,36 +1,39 @@
-📦 ControlAlmacenApp (App Tablet)
-Aplicación Android (Tablet) para gestionar el inventario de un almacén sin servidor, utilizando una base de datos local Room/SQLite.
-Diseñada para un uso rápido, sencillo y accesible por parte de empleados y administradores.
+# 📦 ControlAlmacenApp (App Tablet)
 
-🛠️ Tecnologías
-Android Studio
+Aplicación Android (Tablet) para gestionar inventario de un almacén (sin servidor), con base de datos local **Room/SQLite**.  
+Diseñada para un uso rápido, sencillo e intuitivo por parte de empleados y administradores.
 
-Java
+---
 
-Room (SQLite)
+## 🛠️ Tecnologías
+- **Android Studio**
+- **Java**
+- **Room (SQLite)**
+- **Arquitectura MVC**
+- **GitHub** (control de versiones)
 
-Arquitectura MVC
+---
 
-GitHub (control de versiones)
+## 🚀 Sprints
 
-🚀 Sprints
-🟦 Sprint 1
-Creación del repositorio + README
+### 🟦 Sprint 1
+- Creación del repositorio + README  
+- Proyecto Android (Java) orientado a Tablet  
+- Configuración inicial de Room  
+- Mockups de pantallas principales  
+- Estructura inicial del código (MVC)  
 
-Proyecto Android (Java) orientado a Tablet
+---
 
-Configuración inicial de Room
+## 🔗 LINKS
 
-Mockups de pantallas principales
+### 🎨 Mockups en Figma  
+[![Mockup en Figma](https://img.shields.io/badge/Abrir_en-Figma-blue?logo=figma)](https://www.figma.com/make/N8KyadhP248zclhwFIBMf3/Tablet-format-mockup?p=f&t=hAddy6BxYTXOF53I-0&fullscreen=1)
 
-Estructura inicial del código (MVC)
+### 📋 Planificación en Trello  
+[![Planificación en Trello](https://img.shields.io/badge/Abrir_en-Trello-026AA7?logo=trello&logoColor=white)](https://trello.com/b/FIajnHcb/controlalmacenapp)
 
-🔗 Enlaces del Proyecto
-🎨 Mockups en Figma
-Mockup en Figma (figma.com in Bing)
+### 🗄️ Diagrama de Base de Datos (draw.io)  
+[![Diagrama en Draw.io](https://img.shields.io/badge/Ver_Diagrama-Draw.io-orange?logo=diagramsdotnet)](https://app.diagrams.net/#G1zFJ9oP2Sqk98xDYLeB4oXFHxZpzJpROD#%7B%22pageId%22%3A%22MTJDjkJLnNfbw8Ukrk27%22%7D)
 
-📋 Planificación en Trello
-Planificación en Trello (trello.com in Bing)
-
-🗄️ Diagrama de Base de Datos (draw.io)
-https://app.diagrams.net/#G1zFJ9oP2Sqk98xDYLeB4oXFHxZpzJpROD#%7B%22pageId%22%3A%22MTJDjkJLnNfbw8Ukrk27%22%7D
+---
