@@ -40,7 +40,7 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.VH> {
         Usuario u = usuarios.get(position);
         holder.tvNombre.setText(u.getNombre());
 
-        // Sprint 2: si no hay fotoUri, ponemos icono por defecto
+            // Sprint 2: si no hay fotoUri, ponemos icono por defecto
         holder.imgFoto.setImageResource(R.mipmap.ic_launcher_round);
 
         holder.itemView.setOnClickListener(v -> listener.onClick(u));
