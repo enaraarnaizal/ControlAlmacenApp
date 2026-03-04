@@ -31,7 +31,7 @@ public abstract class AppDatabase extends RoomDatabase {
                         UsuarioDao usuarioDao = INSTANCE.usuarioDao();
                         ProductoDao productoDao = INSTANCE.productoDao();
 
-                        // Usuarios iniciales
+                        // Usuarioss iniciales
                         usuarioDao.insert(new Usuario("Juan García", null,false,null,null,true));
                         usuarioDao.insert(new Usuario("María López", null,false,null,null,true));
                         usuarioDao.insert(new Usuario("Carlos Ruiz", null,false,null,null,true));
