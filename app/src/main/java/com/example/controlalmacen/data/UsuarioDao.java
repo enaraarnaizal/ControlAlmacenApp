@@ -30,6 +30,10 @@ public interface UsuarioDao {
     @Query("SELECT * FROM usuarios WHERE nombre LIKE :patron ORDER BY habilitado DESC, nombre ASC")
     List<Usuario> buscarPorNombre(String patron);
 
+    //seleccion de perfil para el login
+    @Query("SELECT * FROM usuarios WHERE habilitado = 1 ORDER BY nombre ASC")
+    List<Usuario> getUsuariosActivos();
+
     //login/perfil
     @Query("SELECT * FROM usuarios WHERE id = :id LIMIT 1")
     Usuario getById(int id);
