@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.ControlAlmacen" parent="Base.Theme.ControlAlmacen" />
+
+    <!-- Tema para la Splash Screen -->
+    <style name="Theme.ControlAlmacen.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>
