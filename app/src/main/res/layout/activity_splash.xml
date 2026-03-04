@@ -11,8 +11,8 @@
     <!-- Logo que rebota por la pantalla -->
     <ImageView
         android:id="@+id/ivLogo"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         android:src="@drawable/image" />
 
     <!-- Indicación para el usuario (fija abajo) -->

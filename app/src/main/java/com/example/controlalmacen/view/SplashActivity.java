@@ -38,7 +38,7 @@ public class SplashActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
         screenHeight = displayMetrics.heightPixels;
-        logoSize = (int) (200 * displayMetrics.density); // 200dp en píxeles
+        logoSize = (int) (400 * displayMetrics.density); // 400dp en píxeles
 
         // Iniciar animación de rebote
         handler = new Handler();
