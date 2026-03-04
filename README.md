@@ -1,23 +1,36 @@
-# ControlAlmacenApp (App Tablet)
+📦 ControlAlmacenApp (App Tablet)
+Aplicación Android (Tablet) para gestionar el inventario de un almacén sin servidor, utilizando una base de datos local Room/SQLite.
+Diseñada para un uso rápido, sencillo y accesible por parte de empleados y administradores.
 
-Aplicación Android (Tablet) para gestionar inventario de un almacén (sin servidor), con base de datos local (Room/SQLite).
+🛠️ Tecnologías
+Android Studio
 
-## Tecnologías
-- Android Studio
-- Java
-- Room (SQLite)
-- Arquitectura: MVC
-- Control de versiones: GitHub
+Java
 
-## Sprints
-### Sprint 1
-- Repo + README
-- Proyecto Android (Java) orientado a tablet
-- Configuración inicial Room
-- Mockups pantallas principales
-- Estructura inicial del código (MVC)
+Room (SQLite)
 
-## LINKS
+Arquitectura MVC
 
-[![Mockup en Figma](https://img.shields.io/badge/Abrir_en-Figma-blue?logo=figma)](https://www.figma.com/make/N8KyadhP248zclhwFIBMf3/Tablet-format-mockup?p=f&t=hAddy6BxYTXOF53I-0&fullscreen=1)
-[![Planificación en Trello](https://img.shields.io/badge/Abrir_en-Trello-026AA7?logo=trello&logoColor=white)](https://trello.com/b/FIajnHcb/controlalmacenapp)
+GitHub (control de versiones)
+
+🚀 Sprints
+🟦 Sprint 1
+Creación del repositorio + README
+
+Proyecto Android (Java) orientado a Tablet
+
+Configuración inicial de Room
+
+Mockups de pantallas principales
+
+Estructura inicial del código (MVC)
+
+🔗 Enlaces del Proyecto
+🎨 Mockups en Figma
+Mockup en Figma (figma.com in Bing)
+
+📋 Planificación en Trello
+Planificación en Trello (trello.com in Bing)
+
+🗄️ Diagrama de Base de Datos (draw.io)
+https://app.diagrams.net/#G1zFJ9oP2Sqk98xDYLeB4oXFHxZpzJpROD#%7B%22pageId%22%3A%22MTJDjkJLnNfbw8Ukrk27%22%7D
