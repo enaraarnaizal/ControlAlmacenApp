@@ -34,6 +34,6 @@ Diseñada para un uso rápido, sencillo e intuitivo por parte de empleados y adm
 [![Planificación en Trello](https://img.shields.io/badge/Abrir_en-Trello-026AA7?logo=trello&logoColor=white)](https://trello.com/b/FIajnHcb/controlalmacenapp)
 
 ### 🗄️ Diagrama de Base de Datos (draw.io)  
-[![Diagrama en Draw.io](https://img.shields.io/badge/Ver_Diagrama-Draw.io-orange?logo=diagramsdotnet)](https://app.diagrams.net/#G1zFJ9oP2Sqk98xDYLeB4oXFHxZpzJpROD#%7B%22pageId%22%3A%22MTJDjkJLnNfbw8Ukrk27%22%7D)
+[![Diagrama en Draw.io](https://img.shields.io/badge/Ver_Diagrama-Draw.io-orange?logo=diagramsdotnet)](https://drive.google.com/file/d/1zFJ9oP2Sqk98xDYLeB4oXFHxZpzJpROD/view)
 
 ---
