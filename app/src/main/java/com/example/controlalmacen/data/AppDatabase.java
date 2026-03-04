@@ -15,6 +15,7 @@ public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
 
     public abstract UsuarioDao usuarioDao(); //para poder acceder al DAO de usuario
+    public abstract ProductoDao productoDao();
 
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
