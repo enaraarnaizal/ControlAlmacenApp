@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- SECCIÓN: Gestión de Productos -->
+    <group android:checkableBehavior="none">
+        <item
+            android:title="Gestión de Productos"
+            android:enabled="false"
+            android:textColor="@color/black" />
+    </group>
+
+    <item
+        android:id="@+id/nav_editar_producto"
+        android:title="Editar Producto"
+        android:icon="@drawable/ic_edit" />
+
+    <item
+        android:id="@+id/nav_deshabilitar_producto"
+        android:title="Deshabilitar Producto"
+        android:icon="@drawable/ic_visibility_off" />
+
+    <item
+        android:id="@+id/nav_borrar_producto"
+        android:title="Borrar Producto"
+        android:icon="@drawable/ic_delete"
+        android:iconTint="@color/red"
+        android:titleTextColor="@color/red" />
+
+    <!-- Separador -->
+    <item android:title="------" />
+
+    <!-- SECCIÓN: Administración -->
+    <group android:checkableBehavior="none">
+        <item
+            android:title="Administración (Solo Administradores)"
+            android:enabled="true" />
+    </group>
+
+    <item
+        android:id="@+id/nav_perfiles"
+        android:title="Perfiles"
+        android:icon="@drawable/ic_person"
+        android:enabled="false" />
+
+    <item
+        android:id="@+id/nav_albaranes"
+        android:title="Albaranes"
+        android:icon="@drawable/ic_receipt"
+        android:enabled="false" />
+
+    <item
+        android:id="@+id/nav_inventario"
+        android:title="Inventario"
+        android:icon="@drawable/ic_inventory"
+        android:enabled="false" />
+</menu>
