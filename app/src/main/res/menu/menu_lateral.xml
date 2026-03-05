@@ -22,8 +22,6 @@
     <item
         android:id="@+id/nav_borrar_producto"
         android:title="Borrar Producto"
-        android:icon="@drawable/ic_delete"
-        android:iconTint="@color/red"
         android:titleTextColor="@color/red" />
 
     <!-- Separador -->

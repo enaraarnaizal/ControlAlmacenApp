@@ -12,9 +12,6 @@ public class Sesion {
         lastActivityMs = System.currentTimeMillis();
     }
 
-    public static Usuario getUsuarioActual() {
-        return usuario;
-    }
 
     public static Usuario getUsuario() {
         return usuario;

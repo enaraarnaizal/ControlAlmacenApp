@@ -10,14 +10,106 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="24dp">
+        android:padding="16dp">
 
-        <!-- Toolbar -->
+        <!-- Header: Menú | Perfiles | Salir -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Botón Menú izquierda -->
+            <ImageView
+                android:id="@+id/imgMenu"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:contentDescription="Menú"
+                android:padding="4dp"
+                android:src="@android:drawable/ic_menu_sort_by_size" />
+
+            <HorizontalScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/userContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+
+            <!-- Icono Salir -->
+            <ImageView
+                android:id="@+id/imgSalir"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:contentDescription="Salir"
+                android:padding="4dp"
+                android:src="@drawable/ic_logout" />
+        </LinearLayout>
+
+        <!-- Toolbar oculto para el drawer -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/white" />
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <!-- Fila de filtros: "Filtrar" + Botones -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical">
+
+            <!-- Texto "Filtrar" -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filtrar"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Botón Todo -->
+            <Button
+                android:id="@+id/btnTodos"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Todo"
+                android:textSize="12sp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="#E0E0E0"
+                android:textColor="@color/black" />
+
+            <!-- Botón Límite Mínimo -->
+            <Button
+                android:id="@+id/btnLimiteMinimo"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Límite mínimo"
+                android:textSize="12sp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="#E0E0E0"
+                android:textColor="@color/black" />
+
+            <!-- Botón Stock Normal -->
+            <Button
+                android:id="@+id/btnStockNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Stock normal"
+                android:textSize="12sp"
+                android:backgroundTint="#E0E0E0"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
         <!-- Título o contenido de Diario -->
         <TextView
