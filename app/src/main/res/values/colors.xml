@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray_text">#FF757575</color>
     <color name="gray_light">#E0E0E0</color>
     <color name="blue">#2196F3</color>
     <color name="red">#FF0000</color>
+
+
+    <color name="gray_50">#F9FAFB</color>
+    <color name="gray_100">#F3F4F6</color>
+    <color name="gray_200">#E5E7EB</color>
+    <color name="gray_500">#6B7280</color>
+
+    <color name="danger">#EF4444</color>
+    <color name="success">#22C55E</color>
+
+    <color name="warning">#F97316</color>
+    <color name="warning_bg">#FFF7ED</color>
+
+    <color name="danger_bg">#FEE2E2</color>
 
 </resources>

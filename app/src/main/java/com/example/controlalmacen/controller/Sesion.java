@@ -30,3 +30,6 @@ public class Sesion {
         return usuario != null && (System.currentTimeMillis() - lastActivityMs) > 600000;
     }
 }
+
+
+
