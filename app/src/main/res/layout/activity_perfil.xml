@@ -14,12 +14,12 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:text="GestiÃ³n de Perfiles"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Gestión de Perfiles"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvUsuarios"
