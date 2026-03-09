@@ -21,6 +21,7 @@ import java.util.List;
 public class ProductoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public interface Listener {
+        //para la inactiviada del usuario, saber cuando hace clicks
         void onClickAddProducto();
         void onSumar(Producto p);
         void onRestar(Producto p);

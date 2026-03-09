@@ -31,34 +31,36 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiarioActivity extends BaseActivity implements ProductoAdapter.Listener {
+public class DiarioActivity extends BaseActivity implements ProductoAdapter.Listener { //se implementa el archivo de baseactivity para controlar los 10misn de inactividad
 
+    //menu lateral oculto
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
 
-    // UI usuarios + filtros
-    private LinearLayout userContainer;
-    private Button btnTodos, btnLimiteMinimo, btnStockNormal;
-    private ImageView imgSalir;
+    private LinearLayout userContainer; //menu de arriba de usuarios
+    private Button btnTodos, btnLimiteMinimo, btnStockNormal; //botones
+    private ImageView imgSalir; //para el logout
 
+    //listado de usuarios
     private List<Usuario> usuarios = new ArrayList<>();
-    private Usuario selectedUser;              // siempre será el logueado
+    private Usuario selectedUser; // siempre sera el logueado
     private String selectedFilter = "Todos";
 
-    // Productos
+    // listado de Productos
     private ProductoAdapter adapter;
-    private final List<Producto> topList = new ArrayList<>();
-    private final List<Producto> restList = new ArrayList<>();
+    private final List<Producto> topList = new ArrayList<>(); //productos mas usado por el usuario
+    private final List<Producto> restList = new ArrayList<>(); //basicamente el resto de productos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diario);
 
-        // Toolbar + Drawer (como antes)
+        //para q el menu sea la pantalla principal
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //para canectar el menu lateral con la toolbar para el icono del menu se abra y se cierre
         drawerLayout = findViewById(R.id.drawerLayout);
         toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
@@ -70,6 +72,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         NavigationView navigationView = findViewById(R.id.navigationView);
         Menu menu = navigationView.getMenu();
 
+        //desactivar o activar dependiendo el rol con el que te hayas logueado
         boolean esAdmin = Sesion.getUsuario().isAdministrador();
         menu.findItem(R.id.nav_perfiles).setEnabled(esAdmin);
         menu.findItem(R.id.nav_albaranes).setEnabled(esAdmin);
@@ -82,19 +85,20 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
         initViews();
 
-        // Usuario fijo: el de sesión (no se puede cambiar)
+        // usuario fijo, el de sesion (no se puede cambiar)
         selectedUser = Sesion.getUsuario();
 
-        // Filtro por defecto
+        // filtro por defecto
         selectFilter("Todos", btnTodos);
 
-        setupRecycler();
+        setupRecycler(); //lista visual de productos
 
-        // Cargar usuarios arriba (solo para mostrar)
+        // cargar usuarios arriba (solo para mostrar)
         loadUsers();
     }
 
     private void initViews() {
+        //metemos acciones a todos los botones
         userContainer = findViewById(R.id.userContainer);
 
         btnTodos = findViewById(R.id.btnTodos);
@@ -103,13 +107,14 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
         imgSalir = findViewById(R.id.imgSalir);
 
+        //aqui para los filtros tmb
         btnTodos.setOnClickListener(v -> selectFilter("Todos", btnTodos));
         btnLimiteMinimo.setOnClickListener(v -> selectFilter("Límite Mínimo", btnLimiteMinimo));
         btnStockNormal.setOnClickListener(v -> selectFilter("Stock Normal", btnStockNormal));
 
-        // Logout -> MainActivity + limpiar sesión
+        // Logout (cerrar sesion y volver al login, mainactivity)
         imgSalir.setOnClickListener(v -> {
-            Sesion.setUsuario(null); // <-- si tu Sesion usa otro método, dímelo y lo ajusto
+            Sesion.setUsuario(null);
             Intent i = new Intent(DiarioActivity.this, MainActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
@@ -117,18 +122,20 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         });
     }
 
+    //aqui configuramos la lsita de productos
     private void setupRecycler() {
         RecyclerView rvProductos = findViewById(R.id.rvProductos);
 
         adapter = new ProductoAdapter(this);
 
-        GridLayoutManager glm = new GridLayoutManager(this, 2);
+        GridLayoutManager glm = new GridLayoutManager(this, 2); //para poner que haya dos columnas
         glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 int type = adapter.getItemViewType(position);
                 // Header ocupa 2 columnas
                 if (type == 2) return 2;
+                //lo demas 1 (los productos)
                 return 1;
             }
         });
@@ -137,8 +144,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         rvProductos.setAdapter(adapter);
     }
 
-    // USUARIOS (solo mostrar, no cambiar)
-
+    // cargamos los usuarios desde la bd
     private void loadUsers() {
         new Thread(() -> {
             UsuarioDao dao = AppDatabase.getInstance(this).usuarioDao();
@@ -151,6 +157,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         }).start();
     }
 
+    //pone los usuarios arriba
     private void displayUsers() {
         userContainer.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -163,9 +170,9 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             FrameLayout userCircle = userView.findViewById(R.id.userCircle);
             ImageView imgUserIcon = userView.findViewById(R.id.imgUserIcon);
 
-            tvUserName.setText(u.getNombre());
+            tvUserName.setText(u.getNombre()); //para poner el nombre debajo de cada icono
 
-            boolean isSelected = (selectedUser != null && u.getId() == selectedUser.getId());
+            boolean isSelected = (selectedUser != null && u.getId() == selectedUser.getId()); //marcar el usuario con el que esta
 
             if (isSelected) {
                 userCard.setBackgroundResource(R.drawable.bg_card_selected);
@@ -179,7 +186,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 tvUserName.setTextColor(ContextCompat.getColor(this, R.color.gray_text));
             }
 
-            //Bloqueado: no se puede cambiar de usuario
+            //bloquear el cambio de usuario
             userView.setOnClickListener(v ->
                     Toast.makeText(this, "No puedes cambiar de usuario sin cerrar sesión", Toast.LENGTH_SHORT).show()
             );
@@ -188,15 +195,16 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         }
     }
 
-    //  FILTROS
-
+    // cambior el filtro q esta puesto por default
     private void selectFilter(String filter, Button selectedButton) {
         selectedFilter = filter;
 
+        //reseteamos todos
         resetFilterButton(btnTodos);
         resetFilterButton(btnLimiteMinimo);
         resetFilterButton(btnStockNormal);
 
+        //ahora el que se pulsa se marca como activo (estilo)
         selectedButton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.blue));
         selectedButton.setTextColor(ContextCompat.getColor(this, R.color.white));
 
@@ -211,25 +219,27 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         button.setTextColor(ContextCompat.getColor(this, R.color.black));
     }
 
-    // PRODUCTOS (top10 + resto)
+    //PRODUCTOS (top10 + resto)
 
     private void cargarProductos(long usuarioId) {
         new Thread(() -> {
-            AppDatabase db = AppDatabase.getInstance(this);
+            AppDatabase db = AppDatabase.getInstance(this); //abrimos el hilo en 2 plano
 
-            List<Long> idsTop = db.interaccionDao().getTop10Ids(usuarioId);
+            List<Long> idsTop = db.interaccionDao().getTop10Ids(usuarioId); //busca el top10 del usuario con el q estamos
 
             topList.clear();
             restList.clear();
 
+            //creamos listas temporales para luego aplicar a las reales el filtro
             List<Producto> tempTop = new ArrayList<>();
             List<Producto> tempRest = new ArrayList<>();
 
+            //si no tiene historial, osea si no se ha hecho nada aun pilla el orden por alfabeto
             if (idsTop == null || idsTop.isEmpty()) {
 
                 tempTop.addAll(db.productoDao().getPrimeros10());
 
-                List<Producto> all = db.productoDao().getAllHabilitadosOrdenados();
+                List<Producto> all = db.productoDao().getAllHabilitadosOrdenados(); //aqui los seprara entre el 10 y el resto (osea coge los que no estan metidos ya en el top10)
                 for (Producto p : all) {
                     boolean estaEnTop = false;
                     for (Producto t : tempTop) {
@@ -238,12 +248,13 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                     if (!estaEnTop) tempRest.add(p);
                 }
 
+                //si el usuario si tiene hisotrial entonces devuelve los productos recientes usado por el usuario
             } else {
                 tempTop.addAll(db.interaccionDao().getTop10Recientes(usuarioId));
                 tempRest.addAll(db.productoDao().getRestoExcluyendoIds(idsTop));
             }
 
-            // Aplicar filtro según selectedFilter
+            // aplicar filtro segun selectedFilter
             for (Producto p : tempTop) {
                 if (pasaFiltro(p)) topList.add(p);
             }
@@ -272,6 +283,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
     @Override
     public void onClickAddProducto() {
+        //cuando pulsa el el boton de anadir se abre un dig nuevo (formulario)
         android.app.Dialog dialog = new android.app.Dialog(this, R.style.DialogAddProducto);
         dialog.setContentView(R.layout.dialog_add_producto);
 

@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    //eligimos el perfil, guardamos la seison y entramos en diario (la parte de productos)
     private void hacerLogin(Usuario u) {
         Sesion.setUsuario(u);
         startActivity(new Intent(this, DiarioActivity.class));
