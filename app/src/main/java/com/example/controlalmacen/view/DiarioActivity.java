@@ -82,7 +82,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
         initViews();
 
-        // ✅ Usuario fijo: el de sesión (no se puede cambiar)
+        // Usuario fijo: el de sesión (no se puede cambiar)
         selectedUser = Sesion.getUsuario();
 
         // Filtro por defecto
@@ -107,7 +107,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         btnLimiteMinimo.setOnClickListener(v -> selectFilter("Límite Mínimo", btnLimiteMinimo));
         btnStockNormal.setOnClickListener(v -> selectFilter("Stock Normal", btnStockNormal));
 
-        // ✅ Logout -> MainActivity + limpiar sesión
+        // Logout -> MainActivity + limpiar sesión
         imgSalir.setOnClickListener(v -> {
             Sesion.setUsuario(null); // <-- si tu Sesion usa otro método, dímelo y lo ajusto
             Intent i = new Intent(DiarioActivity.this, MainActivity.class);
@@ -137,7 +137,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         rvProductos.setAdapter(adapter);
     }
 
-    // -------------------- USUARIOS (solo mostrar, no cambiar) --------------------
+    // USUARIOS (solo mostrar, no cambiar)
 
     private void loadUsers() {
         new Thread(() -> {
@@ -179,7 +179,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 tvUserName.setTextColor(ContextCompat.getColor(this, R.color.gray_text));
             }
 
-            // ✅ Bloqueado: no se puede cambiar de usuario
+            //Bloqueado: no se puede cambiar de usuario
             userView.setOnClickListener(v ->
                     Toast.makeText(this, "No puedes cambiar de usuario sin cerrar sesión", Toast.LENGTH_SHORT).show()
             );
@@ -188,7 +188,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         }
     }
 
-    // -------------------- FILTROS (solo UI por ahora) --------------------
+    //  FILTROS
 
     private void selectFilter(String filter, Button selectedButton) {
         selectedFilter = filter;
@@ -200,7 +200,10 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         selectedButton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.blue));
         selectedButton.setTextColor(ContextCompat.getColor(this, R.color.white));
 
-        // Más adelante: aplicar filtro real al listado.
+        // Aplicar filtro real al listado
+        if (selectedUser != null) {
+            cargarProductos(selectedUser.getId());
+        }
     }
 
     private void resetFilterButton(Button button) {
@@ -208,7 +211,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         button.setTextColor(ContextCompat.getColor(this, R.color.black));
     }
 
-    // -------------------- PRODUCTOS (top10 + resto) --------------------
+    // PRODUCTOS (top10 + resto)
 
     private void cargarProductos(long usuarioId) {
         new Thread(() -> {
@@ -219,26 +222,50 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             topList.clear();
             restList.clear();
 
+            List<Producto> tempTop = new ArrayList<>();
+            List<Producto> tempRest = new ArrayList<>();
+
             if (idsTop == null || idsTop.isEmpty()) {
 
-                topList.addAll(db.productoDao().getPrimeros10());
+                tempTop.addAll(db.productoDao().getPrimeros10());
 
                 List<Producto> all = db.productoDao().getAllHabilitadosOrdenados();
                 for (Producto p : all) {
                     boolean estaEnTop = false;
-                    for (Producto t : topList) {
+                    for (Producto t : tempTop) {
                         if (t.getId() == p.getId()) { estaEnTop = true; break; }
                     }
-                    if (!estaEnTop) restList.add(p);
+                    if (!estaEnTop) tempRest.add(p);
                 }
 
             } else {
-                topList.addAll(db.interaccionDao().getTop10Recientes(usuarioId));
-                restList.addAll(db.productoDao().getRestoExcluyendoIds(idsTop));
+                tempTop.addAll(db.interaccionDao().getTop10Recientes(usuarioId));
+                tempRest.addAll(db.productoDao().getRestoExcluyendoIds(idsTop));
+            }
+
+            // Aplicar filtro según selectedFilter
+            for (Producto p : tempTop) {
+                if (pasaFiltro(p)) topList.add(p);
+            }
+            for (Producto p : tempRest) {
+                if (pasaFiltro(p)) restList.add(p);
             }
 
             runOnUiThread(() -> adapter.setData(topList, restList));
         }).start();
+    }
+
+
+    private boolean pasaFiltro(Producto p) {
+        switch (selectedFilter) {
+            case "Límite Mínimo":
+                return p.getCantidad() <= p.getCantidadMin();
+            case "Stock Normal":
+                return p.getCantidad() > p.getCantidadMin();
+            case "Todos":
+            default:
+                return true;
+        }
     }
 
     // -------------------- LISTENER del adapter --------------------
