@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         rvPerfiles = findViewById(R.id.rvPerfiles);
 
-        // Grid para tablet (4 columnas, ajusta si quieres)
+        // grid para poner/ver tablet 
         rvPerfiles.setLayoutManager(new GridLayoutManager(this, 3));
 
         cargarPerfiles();
