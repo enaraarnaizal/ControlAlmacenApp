@@ -17,6 +17,7 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.net.Uri;
 
 public class ProductoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -57,10 +58,6 @@ public class ProductoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private int findPositionById(long id) {
-        // pos 0 = add
-        // pos 1..topSize = top
-        // pos header = 1 + topSize (si restSize > 0)
-        // pos rest = header+1 .....
 
         for (int i = 0; i < topList.size(); i++) {
             if (topList.get(i).getId() == id) {
@@ -147,10 +144,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private Producto getProductoByAdapterPosition(int position) {
-        // position 0 = add
-        // position 1..topSize => topList
-        // headerPos = 1 + topSize (si hay resto)
-        // rest empieza en headerPos+1
+
 
         int topIndex = position - 1;
         if (topIndex >= 0 && topIndex < topList.size()) {
@@ -207,9 +201,14 @@ public class ProductoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             tvMinimo.setVisibility(enMinimo ? View.VISIBLE : View.GONE);
 
-            imgProducto.setImageResource(android.R.drawable.ic_menu_gallery);
+            if (p.getImg() != null && !p.getImg().isEmpty()) {
+                imgProducto.setImageURI(Uri.parse(p.getImg()));
+                imgProducto.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            } else {
+                imgProducto.setImageResource(android.R.drawable.ic_menu_gallery);
+                imgProducto.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            }
 
-            // Borde / fondo como mockup
             if (cardProducto != null) {
                 if (sinStock) {
                     cardProducto.setCardBackgroundColor(Color.parseColor("#FEE2E2"));

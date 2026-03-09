@@ -33,50 +33,48 @@ public class SplashActivity extends AppCompatActivity {
 
         ivLogo = findViewById(R.id.ivLogo);
 
-        // Obtener dimensiones de pantalla
+        //obtener tamaño de pantalla
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
         screenHeight = displayMetrics.heightPixels;
         logoSize = (int) (400 * displayMetrics.density);
 
-        // Iniciar animación de rebote
+        //iniciar la animacion de rebote
         handler = new Handler();
         bounceRunnable = new Runnable() {
             @Override
             public void run() {
-                // Actualizar posición
                 posX += velocidadX;
                 posY += velocidadY;
 
-                // Rebote en los bordes horizontales
+                //rebote en los bordes horizontales
                 if (posX + logoSize >= screenWidth || posX <= 0) {
                     velocidadX = -velocidadX;
                 }
 
-                // Rebote en los bordes verticales
+                //rebote en los bordes verticales
                 if (posY + logoSize >= screenHeight || posY <= 0) {
                     velocidadY = -velocidadY;
                 }
 
-                // Aplicar posición
                 ivLogo.setX(posX);
                 ivLogo.setY(posY);
 
-                // Repetir cada 16ms (~60fps)
+                //repetir cada 16ms
                 handler.postDelayed(this, 16);
             }
         };
         handler.post(bounceRunnable);
 
-        // Al pulsar en cualquier parte de la pantalla, ir al login
+        //al pulsar en cualquier parte de la pantalla, ir al login
         findViewById(R.id.splashContainer).setOnClickListener(v -> irALogin());
 
-        // Desactivar el botón atrás en la splash screen
+        //desactivar el btn atras en la splash screen
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                // No hacer nada, el usuario debe pulsar en la pantalla
+                //no hacer nada
             }
         });
     }

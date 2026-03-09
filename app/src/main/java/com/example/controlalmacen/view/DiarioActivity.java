@@ -12,6 +12,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.app.Dialog;
+import android.net.Uri;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.FileProvider;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.io.File;
+import java.io.IOException;
+
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -30,6 +45,12 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+//permisos para acceder a la camra de la tablet
+import android.Manifest;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+
 
 public class DiarioActivity extends BaseActivity implements ProductoAdapter.Listener { //se implementa el archivo de baseactivity para controlar los 10misn de inactividad
 
@@ -50,6 +71,10 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
     private ProductoAdapter adapter;
     private final List<Producto> topList = new ArrayList<>(); //productos mas usado por el usuario
     private final List<Producto> restList = new ArrayList<>(); //basicamente el resto de productos
+
+    //variables para guardar img para el nuevo producto
+    private Uri imagenProductoUri;
+    private ImageView imgPreviewDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +169,60 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         rvProductos.setAdapter(adapter);
     }
 
+
+    private final ActivityResultLauncher<String> galeriaLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    imagenProductoUri = uri;
+                    if (imgPreviewDialog != null) {
+                        imgPreviewDialog.setImageURI(uri);
+                        imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);                    }
+                }
+            });
+
+    private final ActivityResultLauncher<Uri> camaraLauncher =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(), success -> {
+                if (success && imagenProductoUri != null) {
+                    if (imgPreviewDialog != null) {
+                        imgPreviewDialog.setImageURI(imagenProductoUri);
+                        imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);                    }
+                } else {
+                    Toast.makeText(this, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private final ActivityResultLauncher<String> permisoCamaraLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) {
+                    Uri uri = crearUriParaFoto();
+                    if (uri != null) {
+                        imagenProductoUri = uri;
+                        camaraLauncher.launch(uri);
+                    }
+                } else {
+                    Toast.makeText(this, "Debes conceder permiso de cámara", Toast.LENGTH_SHORT).show();
+                }
+            });
+    //preparar la foto de la camara
+    private Uri crearUriParaFoto() {
+        try {
+            File dir = new File(getFilesDir(), "productos");
+            if (!dir.exists()) dir.mkdirs();
+
+            File file = File.createTempFile("prod_", ".jpg", dir);
+
+            return FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",
+                    file
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error preparando la cámara", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
     // cargamos los usuarios desde la bd
     private void loadUsers() {
         new Thread(() -> {
@@ -219,7 +298,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         button.setTextColor(ContextCompat.getColor(this, R.color.black));
     }
 
-    //PRODUCTOS (top10 + resto)
+    //productos (top10 + resto)
 
     private void cargarProductos(long usuarioId) {
         new Thread(() -> {
@@ -279,28 +358,149 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         }
     }
 
-    // -------------------- LISTENER del adapter --------------------
+    //listener del adapter
 
     @Override
     public void onClickAddProducto() {
-        //cuando pulsa el el boton de anadir se abre un dig nuevo (formulario)
-        android.app.Dialog dialog = new android.app.Dialog(this, R.style.DialogAddProducto);
+        //crea y muestra el dialogo (formulario)
+        Dialog dialog = new Dialog(this, R.style.DialogAddProducto);
         dialog.setContentView(R.layout.dialog_add_producto);
 
-        dialog.findViewById(R.id.btnCerrar).setOnClickListener(v -> dialog.dismiss());
-        dialog.findViewById(R.id.btnCancelar).setOnClickListener(v -> dialog.dismiss());
+        //mete las acciones en los botones/img/texto
+        ImageView btnCerrar = dialog.findViewById(R.id.btnCerrar);
 
-        dialog.findViewById(R.id.btnTomarFoto).setOnClickListener(v ->
-                Toast.makeText(this, "Tomar foto (pendiente)", Toast.LENGTH_SHORT).show());
+        com.google.android.material.button.MaterialButton btnTomarFoto = dialog.findViewById(R.id.btnTomarFoto);
+        com.google.android.material.button.MaterialButton btnSubirFoto = dialog.findViewById(R.id.btnSubirFoto);
+        com.google.android.material.button.MaterialButton btnCancelar = dialog.findViewById(R.id.btnCancelar);
+        com.google.android.material.button.MaterialButton btnGuardar = dialog.findViewById(R.id.btnGuardar);
 
-        dialog.findViewById(R.id.btnSubirFoto).setOnClickListener(v ->
-                Toast.makeText(this, "Subir foto (pendiente)", Toast.LENGTH_SHORT).show());
+        //mensajes de error
+        TextInputLayout tilNombre = dialog.findViewById(R.id.tilNombre);
+        TextInputLayout tilCantidad = dialog.findViewById(R.id.tilCantidad);
+        TextInputLayout tilMin = dialog.findViewById(R.id.tilMin);
 
-        dialog.findViewById(R.id.btnGuardar).setOnClickListener(v ->
-                Toast.makeText(this, "Guardar (pendiente)", Toast.LENGTH_SHORT).show());
+        //campos de texto
+        TextInputEditText etNombre = dialog.findViewById(R.id.etNombre);
+        TextInputEditText etCantidad = dialog.findViewById(R.id.etCantidad);
+        TextInputEditText etMin = dialog.findViewById(R.id.etMin);
+
+        CheckBox cbDeshabilitado = dialog.findViewById(R.id.cbDeshabilitado);
+
+        imgPreviewDialog = dialog.findViewById(R.id.imgPreviewProducto);//guarda refenrencia del preview de la img
+        imagenProductoUri = null; //reseta la img actual
+
+        //para cancelar o ir para atras
+        btnCerrar.setOnClickListener(v -> dialog.dismiss());
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+
+        btnTomarFoto.setOnClickListener(v -> {
+            //primero compurebo si tiene permiso la app para usar la camara (si la tiene sigue, sino pide el permiso)
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED) {
+
+                //creamos una rl para la img
+                Uri uri = crearUriParaFoto();
+                if (uri != null) {
+                    imagenProductoUri = uri;//la gaurdamos (variable global de la foto actual)
+                    camaraLauncher.launch(uri); //abrimos la camara
+                }
+
+            } else {
+                permisoCamaraLauncher.launch(Manifest.permission.CAMERA); //aqui no lanzamos la camra primero sino el sistema de permisos
+            }
+        });
+
+        btnSubirFoto.setOnClickListener(v -> galeriaLauncher.launch("image/*")); //seleccionar cualquier tipo de img de la galeria
+
+        btnGuardar.setOnClickListener(v -> {
+            //primero limpiamos los errores anteriores
+            if (tilNombre != null) tilNombre.setError(null);
+            if (tilCantidad != null) tilCantidad.setError(null);
+            if (tilMin != null) tilMin.setError(null);
+
+            //segundo leemos los textos actuales introducidos
+            String nombre = etNombre.getText() != null ? etNombre.getText().toString().trim() : "";
+            String cantidadTxt = etCantidad.getText() != null ? etCantidad.getText().toString().trim() : "";
+            String minTxt = etMin.getText() != null ? etMin.getText().toString().trim() : "";
+
+            boolean hayError = false;
+
+            //validaciones de lo que el usuario a introducido
+            if (nombre.isEmpty()) {
+                tilNombre.setError("Introduce el nombre del producto");
+                hayError = true;
+            }
+
+            if (cantidadTxt.isEmpty()) {
+                tilCantidad.setError("Introduce la cantidad");
+                hayError = true;
+            }
+
+            if (imagenProductoUri == null) {
+                Toast.makeText(this, "Debes añadir una foto", Toast.LENGTH_SHORT).show();
+                hayError = true;
+            }
+
+            if (hayError) return;
+
+            int cantidad;
+            int cantidadMinTemp = 0;
+
+            try {
+                cantidad = Integer.parseInt(cantidadTxt);
+            } catch (NumberFormatException e) {
+                tilCantidad.setError("La cantidad debe ser numérica");
+                return;
+            }
+
+            if (!minTxt.isEmpty()) {
+                try {
+                    cantidadMinTemp = Integer.parseInt(minTxt);
+                } catch (NumberFormatException e) {
+                    tilMin.setError("La cantidad mínima debe ser numérica");
+                    return;
+                }
+            }
+
+            if (cantidad < 0) {
+                tilCantidad.setError("La cantidad no puede ser negativa");
+                return;
+            }
+
+            if (cantidadMinTemp < 0) {
+                tilMin.setError("La cantidad mínima no puede ser negativa");
+                return;
+            }
+
+            //creamos variables finales para usar en el hilo
+            final int cantidadFinal = cantidad;
+            final int cantidadMinFinal = cantidadMinTemp;
+            final boolean habilitadoFinal = !cbDeshabilitado.isChecked();
+            final String imgFinal = imagenProductoUri.toString();
+            final String nombreFinal = nombre;
+
+            new Thread(() -> {
+                AppDatabase db = AppDatabase.getInstance(this);
+
+                Producto nuevo = new Producto(nombreFinal, imgFinal, cantidadFinal, cantidadMinFinal, habilitadoFinal);
+                db.productoDao().insert(nuevo);
+
+                runOnUiThread(() -> { //volvemos al hilo principal para asi actualizar la interfaz
+                    Toast.makeText(this, "Producto añadido correctamente", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss(); //cerramos el formulario
+
+                    //recargamos la lista de productos
+                    if (selectedUser != null) {
+                        cargarProductos(selectedUser.getId());
+                    }
+                });
+            }).start(); //aqui ya ejectuamos el hilo
+        });
 
         dialog.show();
     }
+
 
     @Override
     public void onSumar(Producto p) {
