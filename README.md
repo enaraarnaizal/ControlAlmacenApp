@@ -16,7 +16,7 @@ Diseñada para un uso rápido, sencillo e intuitivo por parte de empleados y adm
 
 ##  Sprints
 
-### 🟦 Sprint 1
+###  Sprint 1
 - Creación del repositorio + README  
 - Proyecto Android (Java) orientado a Tablet  
 - Configuración inicial de Room  
