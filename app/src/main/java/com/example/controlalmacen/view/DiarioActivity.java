@@ -103,8 +103,28 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         menu.findItem(R.id.nav_albaranes).setEnabled(esAdmin);
         menu.findItem(R.id.nav_inventario).setEnabled(esAdmin);
 
+
+        // Listener CORRECTO del menú
         navigationView.setNavigationItemSelectedListener(item -> {
             drawerLayout.closeDrawers();
+
+            int id = item.getItemId();
+
+            if (id == R.id.nav_perfiles) {
+                startActivity(new Intent(DiarioActivity.this, PerfilActivity.class));
+                return true;
+            }
+
+            if (id == R.id.nav_albaranes) {
+                Toast.makeText(this, "Albaranes (pendiente)", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            if (id == R.id.nav_inventario) {
+                Toast.makeText(this, "Inventario (pendiente)", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
             return true;
         });
 
