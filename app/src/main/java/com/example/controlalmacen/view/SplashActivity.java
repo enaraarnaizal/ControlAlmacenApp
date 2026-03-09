@@ -33,19 +33,19 @@ public class SplashActivity extends AppCompatActivity {
 
         ivLogo = findViewById(R.id.ivLogo);
 
-        // Obtener dimensiones de pantalla
+        // Obtener tamaño de pantalla
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
         screenHeight = displayMetrics.heightPixels;
-        logoSize = (int) (400 * displayMetrics.density); // 400dp en píxeles
+        logoSize = (int) (400 * displayMetrics.density); 
 
-        // Iniciar animación de rebote
+        // Iniciar la animacion de rebote
         handler = new Handler();
         bounceRunnable = new Runnable() {
             @Override
             public void run() {
-                // Actualizar posición
+                // Actualizar posicion
                 posX += velocidadX;
                 posY += velocidadY;
 
@@ -59,11 +59,11 @@ public class SplashActivity extends AppCompatActivity {
                     velocidadY = -velocidadY;
                 }
 
-                // Aplicar posición
+                // volvemos a poner posicion
                 ivLogo.setX(posX);
                 ivLogo.setY(posY);
 
-                // Repetir cada 16ms (~60fps)
+                // Repetir cada 16ms
                 handler.postDelayed(this, 16);
             }
         };
@@ -72,11 +72,10 @@ public class SplashActivity extends AppCompatActivity {
         // Al pulsar en cualquier parte de la pantalla, ir al login
         findViewById(R.id.splashContainer).setOnClickListener(v -> irALogin());
 
-        // Desactivar el botón atrás en la splash screen
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                // No hacer nada, el usuario debe pulsar en la pantalla
+                // que no haga nada
             }
         });
     }
