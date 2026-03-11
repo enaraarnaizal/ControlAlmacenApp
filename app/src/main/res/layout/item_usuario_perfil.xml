@@ -2,75 +2,109 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp">
+    android:layout_margin="10dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="6dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:gravity="center"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/imgUsuario"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@android:color/holo_blue_light"
-            android:padding="10dp"
-            android:src="@android:drawable/ic_menu_report_image" />
+        <!-- ICONO USUARIO -->
+        <FrameLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="#2F80ED"
+            android:padding="14dp"
+            android:layout_gravity="center">
 
+            <ImageView
+                android:id="@+id/imgUsuario"
+                android:src="@drawable/ic_user_blue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </FrameLayout>
+
+        <!-- NOMBRE -->
         <TextView
             android:id="@+id/tvNombre"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="Nombre Usuario"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvRol"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rol"
-            android:textColor="#FF9800"
-            android:textSize="14sp" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+            android:textColor="#000"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
+        <!-- ROL -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iconRol"
+                android:src="@drawable/ic_user_blue"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="4dp"/>
+
+            <TextView
+                android:id="@+id/tvRol"
+                android:text="Administrador"
+                android:textColor="#F2A900"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- BOTONES -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="14dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <!-- EDITAR -->
             <ImageButton
                 android:id="@+id/btnEditar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_edit"
-                app:tint="#2F80ED" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_round_blue"
+                android:src="@drawable/ic_edit"
+                android:tint="#FFFFFF"
+                tools:ignore="UseAppTint"/>
 
+            <!-- DESHABILITAR -->
             <ImageButton
                 android:id="@+id/btnDisable"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_lock_power_off"
-                app:tint="#F2A900" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_round_yellow"
+                android:src="@drawable/ic_visibility_off"
+                android:tint="#FFFFFF"
+                android:layout_marginStart="12dp"
+                tools:ignore="UseAppTint"/>
 
+            <!-- BORRAR -->
             <ImageButton
                 android:id="@+id/btnDelete"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_delete"
-                app:tint="#FF3B3B" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_round_red"
+                android:src="@drawable/ic_delete"
+                android:tint="#FFFFFF"
+                android:layout_marginStart="12dp"
+                tools:ignore="UseAppTint"/>
         </LinearLayout>
 
     </LinearLayout>
