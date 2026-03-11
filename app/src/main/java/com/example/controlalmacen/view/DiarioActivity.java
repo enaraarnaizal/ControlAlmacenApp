@@ -1,10 +1,12 @@
 package com.example.controlalmacen.view;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -51,6 +53,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 
+import com.example.controlalmacen.view.SeleccionProductoAdapter;
 
 public class DiarioActivity extends BaseActivity implements ProductoAdapter.Listener { //se implementa el archivo de baseactivity para controlar los 10misn de inactividad
 
@@ -104,11 +107,26 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         menu.findItem(R.id.nav_inventario).setEnabled(esAdmin);
 
 
-        // Listener CORRECTO del menú
+        // Listener del menu lateral
         navigationView.setNavigationItemSelectedListener(item -> {
             drawerLayout.closeDrawers();
 
             int id = item.getItemId();
+
+            if (id == R.id.nav_editar_producto) {
+                abrirSeleccionEditarProducto();
+                return true;
+            }
+
+            if (id == R.id.nav_deshabilitar_producto) {
+                abrirSeleccionDeshabilitarProducto();
+                return true;
+            }
+
+            if (id == R.id.nav_borrar_producto) {
+                abrirSeleccionBorrarProducto();
+                return true;
+            }
 
             if (id == R.id.nav_perfiles) {
                 startActivity(new Intent(DiarioActivity.this, PerfilActivity.class));
@@ -369,9 +387,12 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
     private boolean pasaFiltro(Producto p) {
         switch (selectedFilter) {
             case "Límite Mínimo":
-                return p.getCantidad() <= p.getCantidadMin();
+                return p.isHabilitado()
+                        && p.getCantidadMin() > 0
+                        && p.getCantidad() <= p.getCantidadMin();
             case "Stock Normal":
-                return p.getCantidad() > p.getCantidadMin();
+                return !p.isHabilitado()
+                        || p.getCantidad() > p.getCantidadMin();
             case "Todos":
             default:
                 return true;
@@ -407,6 +428,8 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         CheckBox cbDeshabilitado = dialog.findViewById(R.id.cbDeshabilitado);
 
         imgPreviewDialog = dialog.findViewById(R.id.imgPreviewProducto);//guarda refenrencia del preview de la img
+
+
         imagenProductoUri = null; //reseta la img actual
 
         //para cancelar o ir para atras
@@ -564,5 +587,346 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
             runOnUiThread(() -> adapter.notifyProductoChangedById(p.getId()));
         }).start();
+    }
+
+    //ventana donde salen la lista de todos los productos, tanto para editar, borrar como deshbilitar
+    private void mostrarDialogSeleccionProducto(String titulo, String subtitulo, AccionProducto accion) {
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getInstance(this);
+            List<Producto> productos = db.productoDao().getAllOrdenado();
+
+            runOnUiThread(() -> {
+                if (productos == null || productos.isEmpty()) {
+                    Toast.makeText(this, "No hay productos disponibles", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Dialog dialog = new Dialog(this);
+                dialog.setContentView(R.layout.dialog_seleccionar_producto);
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    dialog.getWindow().setLayout(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                }
+
+                TextView tvTitulo = dialog.findViewById(R.id.tvTituloSeleccion);
+                TextView tvSubtitulo = dialog.findViewById(R.id.tvSubtituloSeleccion);
+                ImageView btnCerrar = dialog.findViewById(R.id.btnCerrarSeleccion);
+                RecyclerView rvProductos = dialog.findViewById(R.id.rvSeleccionProductos);
+
+                tvTitulo.setText(titulo);
+                tvSubtitulo.setText(subtitulo);
+
+                rvProductos.setLayoutManager(new GridLayoutManager(this, 3));
+                rvProductos.setAdapter(new SeleccionProductoAdapter(productos, producto -> {
+                    dialog.dismiss();
+                    accion.onProductoSeleccionado(producto);
+                }));
+
+                btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+                dialog.show();
+            });
+        }).start();
+    }
+
+    private interface AccionProducto {
+        void onProductoSeleccionado(Producto producto);
+    }
+
+    private void abrirSeleccionEditarProducto() {
+        mostrarDialogSeleccionProducto(
+                "Seleccionar Producto para Editar",
+                "Haz clic en el producto que deseas modificar",
+                producto -> mostrarDialogEditarProducto(producto)
+        );
+    }
+    private void abrirSeleccionDeshabilitarProducto() {
+        mostrarDialogSeleccionProductoSoloActivos(
+                "Seleccionar Producto para Deshabilitar",
+                "Haz clic en el producto activo que deseas deshabilitar",
+                producto -> mostrarConfirmacionDeshabilitar(producto)
+        );
+    }
+    private void mostrarDialogSeleccionProductoSoloActivos(String titulo, String subtitulo, AccionProducto accion) {
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getInstance(this);
+
+            List<Producto> productos = db.productoDao().getProductosActivosOrdenados();
+
+            runOnUiThread(() -> {
+                if (productos == null || productos.isEmpty()) {
+                    Toast.makeText(this, "No hay productos activos para deshabilitar", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Dialog dialog = new Dialog(this);
+                dialog.setContentView(R.layout.dialog_seleccionar_producto);
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    dialog.getWindow().setLayout(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                }
+
+                TextView tvTitulo = dialog.findViewById(R.id.tvTituloSeleccion);
+                TextView tvSubtitulo = dialog.findViewById(R.id.tvSubtituloSeleccion);
+                ImageView btnCerrar = dialog.findViewById(R.id.btnCerrarSeleccion);
+                RecyclerView rvProductos = dialog.findViewById(R.id.rvSeleccionProductos);
+
+                tvTitulo.setText(titulo);
+                tvSubtitulo.setText(subtitulo);
+
+                rvProductos.setLayoutManager(new GridLayoutManager(this, 3));
+                rvProductos.setAdapter(new SeleccionProductoAdapter(productos, producto -> {
+                    dialog.dismiss();
+                    accion.onProductoSeleccionado(producto);
+                }));
+
+                btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+                dialog.show();
+            });
+        }).start();
+    }
+    private void mostrarConfirmacionDeshabilitar(Producto producto) {
+        String mensaje;
+
+        if (producto.isHabilitado()) {
+            mensaje = "¿Seguro que quieres deshabilitar el producto \"" + producto.getNombre() + "\"?";
+        } else {
+            mensaje = "El producto \"" + producto.getNombre() + "\" ya está deshabilitado.";
+        }
+
+        if (!producto.isHabilitado()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Producto ya deshabilitado")
+                    .setMessage(mensaje)
+                    .setPositiveButton("Aceptar", null)
+                    .show();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Deshabilitar producto")
+                .setMessage(mensaje)
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Deshabilitar", (dialog, which) -> {
+                    new Thread(() -> {
+                        AppDatabase db = AppDatabase.getInstance(this);
+
+                        producto.setHabilitado(false);
+                        db.productoDao().update(producto);
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(this, "Producto deshabilitado correctamente", Toast.LENGTH_SHORT).show();
+                            if (selectedUser != null) {
+                                cargarProductos(selectedUser.getId());
+                            }
+                        });
+                    }).start();
+                })
+                .show();
+    }
+
+    private void abrirSeleccionBorrarProducto() {
+        mostrarDialogSeleccionProducto(
+                "Seleccionar Producto para Borrar",
+                "Haz clic en el producto que deseas eliminar",
+                producto -> mostrarConfirmacionBorrar(producto)
+        );
+    }
+
+    private void mostrarConfirmacionBorrar(Producto producto) {
+        new AlertDialog.Builder(this)
+                .setTitle("Borrar producto")
+                .setMessage("¿Seguro que quieres borrar el producto \"" + producto.getNombre() + "\"? Esta acción no se puede deshacer.")
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Borrar", (dialog, which) -> {
+                    new Thread(() -> {
+                        AppDatabase db = AppDatabase.getInstance(this);
+                        db.productoDao().delete(producto);
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(this, "Producto borrado correctamente", Toast.LENGTH_SHORT).show();
+                            if (selectedUser != null) {
+                                cargarProductos(selectedUser.getId());
+                            }
+                        });
+                    }).start();
+                })
+                .show();
+    }
+
+    private void mostrarDialogEditarProducto(Producto producto) {
+        Dialog dialog = new Dialog(this, R.style.DialogAddProducto);
+        dialog.setContentView(R.layout.dialog_add_producto);
+
+        ImageView btnCerrar = dialog.findViewById(R.id.btnCerrar);
+
+        com.google.android.material.button.MaterialButton btnTomarFoto = dialog.findViewById(R.id.btnTomarFoto);
+        com.google.android.material.button.MaterialButton btnSubirFoto = dialog.findViewById(R.id.btnSubirFoto);
+        com.google.android.material.button.MaterialButton btnCancelar = dialog.findViewById(R.id.btnCancelar);
+        com.google.android.material.button.MaterialButton btnGuardar = dialog.findViewById(R.id.btnGuardar);
+
+        TextInputLayout tilNombre = dialog.findViewById(R.id.tilNombre);
+        TextInputLayout tilCantidad = dialog.findViewById(R.id.tilCantidad);
+        TextInputLayout tilMin = dialog.findViewById(R.id.tilMin);
+
+        TextInputEditText etNombre = dialog.findViewById(R.id.etNombre);
+        TextInputEditText etCantidad = dialog.findViewById(R.id.etCantidad);
+        TextInputEditText etMin = dialog.findViewById(R.id.etMin);
+
+        CheckBox cbDeshabilitado = dialog.findViewById(R.id.cbDeshabilitado);
+
+        imgPreviewDialog = dialog.findViewById(R.id.imgPreviewProducto);
+
+        //cambiamos textos de los botones para el form de edicion
+        btnGuardar.setText("Guardar cambios");
+        btnCancelar.setText("Cancelar");
+        btnTomarFoto.setText("Tomar foto");
+        btnSubirFoto.setText("Subir foto");
+
+        //precargar datos del producto
+        etNombre.setText(producto.getNombre());
+        etCantidad.setText(String.valueOf(producto.getCantidad()));
+
+        if (producto.getCantidadMin() > 0) {
+            etMin.setText(String.valueOf(producto.getCantidadMin()));
+        } else {
+            etMin.setText("");
+        }
+
+        cbDeshabilitado.setChecked(!producto.isHabilitado());
+
+        if (producto.getImg() != null && !producto.getImg().isEmpty()) {
+            imagenProductoUri = Uri.parse(producto.getImg());
+            imgPreviewDialog.setImageURI(imagenProductoUri);
+            imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        } else {
+            imagenProductoUri = null;
+            imgPreviewDialog.setImageResource(android.R.drawable.ic_menu_gallery);
+            imgPreviewDialog.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        }
+
+        btnCerrar.setOnClickListener(v -> dialog.dismiss());
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnTomarFoto.setOnClickListener(v -> {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED) {
+
+                Uri uri = crearUriParaFoto();
+                if (uri != null) {
+                    imagenProductoUri = uri;
+                    camaraLauncher.launch(uri);
+                }
+
+            } else {
+                permisoCamaraLauncher.launch(Manifest.permission.CAMERA);
+            }
+        });
+
+        btnSubirFoto.setOnClickListener(v -> galeriaLauncher.launch("image/*"));
+
+        btnGuardar.setOnClickListener(v -> {
+            if (tilNombre != null) tilNombre.setError(null);
+            if (tilCantidad != null) tilCantidad.setError(null);
+            if (tilMin != null) tilMin.setError(null);
+
+            String nombre = etNombre.getText() != null ? etNombre.getText().toString().trim() : "";
+            String cantidadTxt = etCantidad.getText() != null ? etCantidad.getText().toString().trim() : "";
+            String minTxt = etMin.getText() != null ? etMin.getText().toString().trim() : "";
+
+            boolean hayError = false;
+
+            if (nombre.isEmpty()) {
+                tilNombre.setError("Introduce el nombre del producto");
+                hayError = true;
+            }
+
+            if (cantidadTxt.isEmpty()) {
+                tilCantidad.setError("Introduce la cantidad");
+                hayError = true;
+            }
+
+            //en editar la imagen no tiene por que ser nueva
+            //solo da error si no existe ni la antigua ni una nueva
+            if (imagenProductoUri == null) {
+                Toast.makeText(this, "Debes añadir una foto", Toast.LENGTH_SHORT).show();
+                hayError = true;
+            }
+
+            if (hayError) return;
+
+            int cantidad;
+            int cantidadMinTemp = 0;
+
+            try {
+                cantidad = Integer.parseInt(cantidadTxt);
+            } catch (NumberFormatException e) {
+                tilCantidad.setError("La cantidad debe ser numérica");
+                return;
+            }
+
+            if (!minTxt.isEmpty()) {
+                try {
+                    cantidadMinTemp = Integer.parseInt(minTxt);
+                } catch (NumberFormatException e) {
+                    tilMin.setError("La cantidad mínima debe ser numérica");
+                    return;
+                }
+            }
+
+            if (cantidad < 0) {
+                tilCantidad.setError("La cantidad no puede ser negativa");
+                return;
+            }
+
+            if (cantidadMinTemp < 0) {
+                tilMin.setError("La cantidad mínima no puede ser negativa");
+                return;
+            }
+
+            final String nombreFinal = nombre;
+            final int cantidadFinal = cantidad;
+            final int cantidadMinFinal = cantidadMinTemp;
+            final boolean habilitadoFinal = !cbDeshabilitado.isChecked();
+            final String imgFinal = imagenProductoUri.toString();
+
+            new Thread(() -> {
+                AppDatabase db = AppDatabase.getInstance(this);
+
+                producto.setNombre(nombreFinal);
+                producto.setCantidad(cantidadFinal);
+                producto.setCantidadMin(cantidadMinFinal);
+                producto.setHabilitado(habilitadoFinal);
+                producto.setImg(imgFinal);
+
+                Producto existente = db.productoDao().getByNombreExacto(nombreFinal);
+                if (existente != null && existente.getId() != producto.getId()) {
+                    runOnUiThread(() -> tilNombre.setError("Ya existe otro producto con ese nombre"));
+                    return;
+                }
+
+                db.productoDao().update(producto);
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Producto modificado correctamente", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+
+                    if (selectedUser != null) {
+                        cargarProductos(selectedUser.getId());
+                    }
+                });
+            }).start();
+        });
+
+        dialog.show();
     }
 }

@@ -144,17 +144,23 @@ public class ProductoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private Producto getProductoByAdapterPosition(int position) {
-
-
         int topIndex = position - 1;
         if (topIndex >= 0 && topIndex < topList.size()) {
             return topList.get(topIndex);
         }
 
-        // resto
         int headerPos = 1 + topList.size();
         int restIndex = position - (headerPos + 1);
-        return restList.get(restIndex);
+
+        if (restIndex >= 0 && restIndex < restList.size()) {
+            return restList.get(restIndex);
+        }
+
+        throw new IllegalStateException(
+                "Posición inválida: position=" + position +
+                        ", topSize=" + topList.size() +
+                        ", restSize=" + restList.size()
+        );
     }
 
     static class AddVH extends RecyclerView.ViewHolder {
@@ -196,14 +202,22 @@ public class ProductoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             tvNombre.setText(p.getNombre());
             tvCantidad.setText("Cantidad: " + p.getCantidad());
 
-            boolean enMinimo = p.getCantidad() <= p.getCantidadMin();
+            boolean enMinimo = p.isHabilitado()
+                    && p.getCantidadMin() > 0
+                    && p.getCantidad() <= p.getCantidadMin();
+
             boolean sinStock = p.getCantidad() == 0;
 
             tvMinimo.setVisibility(enMinimo ? View.VISIBLE : View.GONE);
 
             if (p.getImg() != null && !p.getImg().isEmpty()) {
-                imgProducto.setImageURI(Uri.parse(p.getImg()));
-                imgProducto.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                try {
+                    imgProducto.setImageURI(Uri.parse(p.getImg()));
+                    imgProducto.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                } catch (Exception e) {
+                    imgProducto.setImageResource(android.R.drawable.ic_menu_gallery);
+                    imgProducto.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                }
             } else {
                 imgProducto.setImageResource(android.R.drawable.ic_menu_gallery);
                 imgProducto.setScaleType(ImageView.ScaleType.CENTER_INSIDE);

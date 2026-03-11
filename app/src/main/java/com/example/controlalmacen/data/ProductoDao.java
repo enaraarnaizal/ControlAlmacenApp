@@ -1,6 +1,7 @@
 package com.example.controlalmacen.data;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
@@ -47,4 +48,12 @@ public interface ProductoDao {
     //si no hay top entonces el resto a partir de los primeros 10
     @Query("SELECT * FROM productos WHERE habilitado = 1 ORDER BY nombre ASC")
     List<Producto> getAllHabilitadosOrdenados();
+
+
+    @Query("SELECT * FROM productos WHERE nombre = :nombre LIMIT 1")
+    Producto getByNombreExacto(String nombre);
+    @Query("SELECT * FROM productos WHERE habilitado = 1 ORDER BY nombre ASC")
+    List<Producto> getProductosActivosOrdenados();
+    @Delete
+    void delete(Producto producto);
 }
