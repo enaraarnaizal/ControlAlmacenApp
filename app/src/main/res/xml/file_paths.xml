@@ -3,4 +3,7 @@
     <files-path
         name="productos"
         path="productos/" />
+    <files-path
+        name="albaranes"
+        path="albaranes/" />
 </paths>
