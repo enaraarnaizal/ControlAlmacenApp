@@ -6,7 +6,7 @@
         <item
             android:title="Gestión de Productos"
             android:enabled="false"
-            android:textColor="@color/black" />
+            android:titleTextColor="#444444" />
     </group>
 
     <item
@@ -22,33 +22,35 @@
     <item
         android:id="@+id/nav_borrar_producto"
         android:title="Borrar Producto"
-        android:titleTextColor="@color/red" />
+        android:icon="@drawable/ic_delete" />
 
     <!-- Separador -->
-    <item android:title="------" />
+    <item android:title=" " />
 
     <!-- SECCIÓN: Administración -->
     <group android:checkableBehavior="none">
         <item
             android:title="Administración (Solo Administradores)"
-            android:enabled="true" />
+            android:enabled="false"
+            android:titleTextColor="#444444" />
+
+        <item
+            android:id="@+id/nav_perfiles"
+            android:title="Perfiles"
+            android:icon="@drawable/ic_person_filled"
+            android:enabled="false" />
+
+        <item
+            android:id="@+id/nav_albaranes"
+            android:title="Albaranes"
+            android:icon="@drawable/ic_receipt_filled"
+            android:enabled="false" />
+
+        <item
+            android:id="@+id/nav_inventario"
+            android:title="Inventario"
+            android:icon="@drawable/ic_inventory_filled"
+            android:enabled="false" />
     </group>
 
-    <item
-        android:id="@+id/nav_perfiles"
-        android:title="Perfiles"
-        android:icon="@drawable/ic_person"
-        android:enabled="false" />
-
-    <item
-        android:id="@+id/nav_albaranes"
-        android:title="Albaranes"
-        android:icon="@drawable/ic_receipt"
-        android:enabled="false" />
-
-    <item
-        android:id="@+id/nav_inventario"
-        android:title="Inventario"
-        android:icon="@drawable/ic_inventory"
-        android:enabled="false" />
 </menu>

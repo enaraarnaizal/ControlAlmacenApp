@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,18 +29,26 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
 
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil);
 
+        ImageButton btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
         rvUsuarios = findViewById(R.id.rvUsuarios);
         rvUsuarios.setLayoutManager(new GridLayoutManager(this, 3));
 
-
-        // CORRECCIÓN: Llamar al método que realmente carga los datos
         cargarUsuarios();
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
+
 
 
     private void cargarUsuarios() {
@@ -154,20 +163,37 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
 
 
     @Override
+
     public void onDeshabilitar(Usuario u) {
-        new Thread(() -> {
-            AppDatabase db = AppDatabase.getInstance(this);
-            u.setHabilitado(!u.isHabilitado());
-            db.usuarioDao().update(u);
 
+        String mensaje = u.isHabilitado()
+                ? "¿Seguro que deseas DESHABILITAR este perfil?"
+                : "¿Seguro que deseas HABILITAR este perfil?";
 
-            runOnUiThread(() -> {
-                Toast.makeText(this,
-                        u.isHabilitado() ? "Perfil habilitado" : "Perfil deshabilitado",
-                        Toast.LENGTH_SHORT).show();
-                cargarUsuarios();
-            });
-        }).start();
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmar acción")
+                .setMessage(mensaje)
+                .setPositiveButton("Sí", (d, w) -> {
+
+                    new Thread(() -> {
+                        AppDatabase db = AppDatabase.getInstance(this);
+
+                        // Cambiar estado
+                        u.setHabilitado(!u.isHabilitado());
+                        db.usuarioDao().update(u);
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(this,
+                                    u.isHabilitado() ? "Perfil habilitado" : "Perfil deshabilitado",
+                                    Toast.LENGTH_SHORT).show();
+
+                            cargarUsuarios(); // recargar lista
+                        });
+                    }).start();
+
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
 
