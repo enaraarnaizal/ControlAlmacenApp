@@ -13,7 +13,7 @@ public class BaseActivity extends AppCompatActivity {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    // se ejecuta cada 1 segundo y comprueba si la sesión ha caducado
+    // se ejecuta cada 1 segundo y comprueba si la sesion ha caducado
     private final Runnable checkTimeoutRunnable = new Runnable() {
         @Override
         public void run() {

@@ -28,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         rvPerfiles = findViewById(R.id.rvPerfiles);
+
+
+        // grid para poner/ver tablet >>>>>>> main
         rvPerfiles.setLayoutManager(new GridLayoutManager(this, 3));
 
         cargarPerfiles();
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, DiarioActivity.class));
         finish();
     }
+
 
     private void mostrarDialogoAdmin(Usuario u) {
         Dialog dialog = new Dialog(this);
@@ -91,4 +95,5 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.show();
     }
+
 }
