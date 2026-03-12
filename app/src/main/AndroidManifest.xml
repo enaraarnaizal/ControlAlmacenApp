@@ -20,6 +20,12 @@
         <activity
             android:name=".view.PerfilActivity"
             android:exported="false" />
+        <activity
+            android:name=".view.AlbaranActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.InformeAlbaranesActivity"
+            android:exported="false" />
         <activity android:name=".view.DiarioActivity" />
         <activity
             android:name=".view.MainActivity"

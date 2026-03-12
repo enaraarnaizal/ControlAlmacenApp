@@ -8,11 +8,12 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.example.controlalmacen.model.Albaran;
 import com.example.controlalmacen.model.Interaccion;
 import com.example.controlalmacen.model.Usuario;
 import com.example.controlalmacen.model.Producto;
 
-@Database(entities = {Usuario.class, Producto.class,  Interaccion.class}, version = 1)
+@Database(entities = {Usuario.class, Producto.class,  Interaccion.class, Albaran.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -20,6 +21,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract UsuarioDao usuarioDao();
     public abstract ProductoDao productoDao();
     public abstract InteraccionDao interaccionDao();
+    public abstract AlbaranDao albaranDao();
 
 
     private static final RoomDatabase.Callback roomCallback =
@@ -33,6 +35,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
                         UsuarioDao usuarioDao = INSTANCE.usuarioDao();
                         ProductoDao productoDao = INSTANCE.productoDao();
+                        AlbaranDao albaranDao = INSTANCE.albaranDao();
 
                         // Usuarioss iniciales
                         usuarioDao.insert(new Usuario("Juan García", null,false,null,null,true));
@@ -66,6 +69,23 @@ public abstract class AppDatabase extends RoomDatabase {
                         productoDao.insert(new Producto("Brocas 8mm", null, 85, 20, true));
                         productoDao.insert(new Producto("Brocas 10mm", null, 75, 15, true));
 
+                        // Albaranes de ejemplo (diferentes fechas)
+                        long ahora = System.currentTimeMillis();
+                        long unDia = 24 * 60 * 60 * 1000L;
+                        String imagenDefault = "android.resource://com.example.controlalmacen/drawable/ic_albaran_default";
+
+                        // Albaranes del mes actual
+                        albaranDao.insert(new Albaran(1, ahora, "B12345678", "Tornillos SA", 1250.50, true, ahora - (1 * unDia), imagenDefault));
+                        albaranDao.insert(new Albaran(1, ahora - (2 * unDia), "A98765432", "Construcción ABC SL", 3500.00, false, null, imagenDefault));
+                        albaranDao.insert(new Albaran(2, ahora - (5 * unDia), "C11223344", "Ferretería López", 850.75, true, ahora - (3 * unDia), imagenDefault));
+                        albaranDao.insert(new Albaran(1, ahora - (7 * unDia), "B55667788", "Materiales García", 2100.00, true, ahora - (6 * unDia), imagenDefault));
+
+                        // Albaranes de semanas anteriores
+                        albaranDao.insert(new Albaran(3, ahora - (10 * unDia), "A33445566", "Suministros Pérez", 1500.25, false, null, imagenDefault));
+                        albaranDao.insert(new Albaran(2, ahora - (15 * unDia), "B77889900", "Herramientas Pro", 950.00, true, ahora - (12 * unDia), imagenDefault));
+                        albaranDao.insert(new Albaran(1, ahora - (20 * unDia), "C22334455", "Distribuciones Norte", 4200.50, false, null, imagenDefault));
+                        albaranDao.insert(new Albaran(1, ahora - (25 * unDia), "A66778899", "Lubricantes Industrial", 675.30, true, ahora - (24 * unDia), imagenDefault));
+
                     }).start();
                 }
             };
@@ -79,6 +99,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     AppDatabase.class,
                                     "control_almacen.db"
                             )
+                            .fallbackToDestructiveMigration()
                             .addCallback(roomCallback)
                             .build();
                 }

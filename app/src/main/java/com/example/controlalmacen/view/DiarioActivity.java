@@ -106,6 +106,9 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         menu.findItem(R.id.nav_albaranes).setEnabled(esAdmin);
         menu.findItem(R.id.nav_inventario).setEnabled(esAdmin);
 
+        // Ocultar albaranes visualmente para usuarios no administradores
+        menu.findItem(R.id.nav_albaranes).setVisible(esAdmin);
+
 
         // Listener del menu lateral
         navigationView.setNavigationItemSelectedListener(item -> {
@@ -134,7 +137,12 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             }
 
             if (id == R.id.nav_albaranes) {
-                Toast.makeText(this, "Albaranes (pendiente)", Toast.LENGTH_SHORT).show();
+                // Solo el administrador puede acceder a los albaranes
+                if (Sesion.getUsuario() != null && Sesion.getUsuario().isAdministrador()) {
+                    startActivity(new Intent(DiarioActivity.this, AlbaranActivity.class));
+                } else {
+                    Toast.makeText(this, "Solo los administradores pueden acceder a los albaranes", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
 
