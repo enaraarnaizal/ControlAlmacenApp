@@ -110,7 +110,7 @@ public class InformeAlbaranesActivity extends BaseActivity {
                 rvAlbaranesInforme.setLayoutManager(new LinearLayoutManager(this));
                 rvAlbaranesInforme.setAdapter(new AlbaranAdapter(albaranes, albaran -> {
                     // No hacer nada al hacer click
-                }));
+                }, null)); // null porque no necesitamos listener de selección en el informe
             });
         }).start();
     }

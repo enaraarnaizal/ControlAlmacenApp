@@ -74,14 +74,23 @@
                 android:visibility="gone"/>
         </LinearLayout>
 
-        <!-- Icono de más opciones -->
+        <!-- CheckBox para seleccionar -->
+        <CheckBox
+            android:id="@+id/cbSeleccionarItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="Seleccionar albarán"/>
+
+        <!-- Icono para ver detalles -->
         <ImageView
             android:id="@+id/imgOpciones"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="center_vertical"
-            android:src="@android:drawable/ic_menu_more"
-            android:contentDescription="Más opciones"/>
+            android:src="@android:drawable/ic_menu_info_details"
+            android:contentDescription="Ver detalles"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
 

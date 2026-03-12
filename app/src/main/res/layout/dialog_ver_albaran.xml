@@ -175,14 +175,6 @@
                         android:text="28/02/2026"
                         android:textColor="#333333"/>
                 </LinearLayout>
-
-                <!-- CheckBox para seleccionar -->
-                <CheckBox
-                    android:id="@+id/cbSeleccionarAlbaran"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Seleccionar para informe"
-                    android:layout_marginTop="8dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

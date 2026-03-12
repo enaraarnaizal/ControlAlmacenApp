@@ -3,6 +3,7 @@ package com.example.controlalmacen.view;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,8 +16,10 @@ import com.example.controlalmacen.model.Albaran;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class AlbaranAdapter extends RecyclerView.Adapter<AlbaranAdapter.VH> {
 
@@ -24,14 +27,21 @@ public class AlbaranAdapter extends RecyclerView.Adapter<AlbaranAdapter.VH> {
         void onClick(Albaran albaran);
     }
 
+    public interface OnSelectionChanged {
+        void onChanged(Set<Long> idsSeleccionados);
+    }
+
     private List<Albaran> albaranes;
     private final OnAlbaranClick listener;
+    private final OnSelectionChanged selectionListener;
     private final SimpleDateFormat dateFormat;
     private final NumberFormat currencyFormat;
+    private final Set<Long> idsSeleccionados = new HashSet<>();
 
-    public AlbaranAdapter(List<Albaran> albaranes, OnAlbaranClick listener) {
+    public AlbaranAdapter(List<Albaran> albaranes, OnAlbaranClick listener, OnSelectionChanged selectionListener) {
         this.albaranes = albaranes;
         this.listener = listener;
+        this.selectionListener = selectionListener;
         this.dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         this.currencyFormat = NumberFormat.getCurrencyInstance(new Locale("es", "ES"));
     }
@@ -72,7 +82,28 @@ public class AlbaranAdapter extends RecyclerView.Adapter<AlbaranAdapter.VH> {
             holder.imgTipoAlbaran.setColorFilter(holder.itemView.getContext().getColor(android.R.color.holo_orange_dark));
         }
 
-        holder.itemView.setOnClickListener(v -> listener.onClick(albaran));
+        // Configurar checkbox de selección
+        if (selectionListener != null) {
+            // Modo selección activo (lista normal de albaranes)
+            holder.cbSeleccionarItem.setVisibility(View.VISIBLE);
+            holder.cbSeleccionarItem.setOnCheckedChangeListener(null); // Limpiar listener anterior
+            holder.cbSeleccionarItem.setChecked(idsSeleccionados.contains(albaran.getId()));
+
+            holder.cbSeleccionarItem.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    idsSeleccionados.add(albaran.getId());
+                } else {
+                    idsSeleccionados.remove(albaran.getId());
+                }
+                selectionListener.onChanged(idsSeleccionados);
+            });
+        } else {
+            // Modo informe (sin selección)
+            holder.cbSeleccionarItem.setVisibility(View.GONE);
+        }
+
+        // Solo el ícono de opciones abre el diálogo de detalles
+        holder.imgOpciones.setOnClickListener(v -> listener.onClick(albaran));
     }
 
     @Override
@@ -82,7 +113,34 @@ public class AlbaranAdapter extends RecyclerView.Adapter<AlbaranAdapter.VH> {
 
     public void updateData(List<Albaran> nuevosAlbaranes) {
         this.albaranes = nuevosAlbaranes;
+        idsSeleccionados.clear(); // Limpiar selecciones al actualizar datos
         notifyDataSetChanged();
+        if (selectionListener != null) {
+            selectionListener.onChanged(idsSeleccionados);
+        }
+    }
+
+    public Set<Long> getIdsSeleccionados() {
+        return new HashSet<>(idsSeleccionados);
+    }
+
+    public void limpiarSeleccion() {
+        idsSeleccionados.clear();
+        notifyDataSetChanged();
+        if (selectionListener != null) {
+            selectionListener.onChanged(idsSeleccionados);
+        }
+    }
+
+    public void seleccionarTodos() {
+        idsSeleccionados.clear();
+        for (Albaran albaran : albaranes) {
+            idsSeleccionados.add(albaran.getId());
+        }
+        notifyDataSetChanged();
+        if (selectionListener != null) {
+            selectionListener.onChanged(idsSeleccionados);
+        }
     }
 
     static class VH extends RecyclerView.ViewHolder {
@@ -92,6 +150,7 @@ public class AlbaranAdapter extends RecyclerView.Adapter<AlbaranAdapter.VH> {
         TextView tvFecha;
         TextView tvObservaciones;
         ImageView imgOpciones;
+        CheckBox cbSeleccionarItem;
 
         VH(@NonNull View itemView) {
             super(itemView);
@@ -101,6 +160,7 @@ public class AlbaranAdapter extends RecyclerView.Adapter<AlbaranAdapter.VH> {
             tvFecha = itemView.findViewById(R.id.tvFecha);
             tvObservaciones = itemView.findViewById(R.id.tvObservaciones);
             imgOpciones = itemView.findViewById(R.id.imgOpciones);
+            cbSeleccionarItem = itemView.findViewById(R.id.cbSeleccionarItem);
         }
     }
 }

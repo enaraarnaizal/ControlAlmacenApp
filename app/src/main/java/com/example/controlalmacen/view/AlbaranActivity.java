@@ -104,8 +104,13 @@ public class AlbaranActivity extends BaseActivity {
 
     private void configurarRecyclerView() {
         rvAlbaranes.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AlbaranAdapter(new ArrayList<>(), this::mostrarDialogVerAlbaran);
+        adapter = new AlbaranAdapter(new ArrayList<>(), this::mostrarDialogVerAlbaran, this::onSelectionChanged);
         rvAlbaranes.setAdapter(adapter);
+    }
+
+    private void onSelectionChanged(Set<Long> idsSeleccionados) {
+        this.idsSeleccionados = idsSeleccionados;
+        actualizarContadorSeleccion();
     }
 
     private void configurarListeners() {
@@ -158,16 +163,13 @@ public class AlbaranActivity extends BaseActivity {
         btnSeleccionarTodos.setOnClickListener(v -> {
             if (idsSeleccionados.size() == albaranesActuales.size()) {
                 // Deseleccionar todos
-                idsSeleccionados.clear();
+                adapter.limpiarSeleccion();
                 btnSeleccionarTodos.setText("Seleccionar todos");
             } else {
                 // Seleccionar todos
-                for (Albaran a : albaranesActuales) {
-                    idsSeleccionados.add(a.getId());
-                }
+                adapter.seleccionarTodos();
                 btnSeleccionarTodos.setText("Deseleccionar todos");
             }
-            actualizarContadorSeleccion();
         });
     }
 
@@ -222,8 +224,7 @@ public class AlbaranActivity extends BaseActivity {
                 albaranesActuales = albaranes;
                 adapter.updateData(albaranes);
                 tvFiltroActual.setText("Mostrando: Mes actual (" + albaranes.size() + " albaranes)");
-                idsSeleccionados.clear();
-                actualizarContadorSeleccion();
+                // idsSeleccionados ya se limpia en adapter.updateData()
             });
         }).start();
     }
@@ -250,8 +251,7 @@ public class AlbaranActivity extends BaseActivity {
                 albaranesActuales = albaranes;
                 adapter.updateData(albaranes);
                 tvFiltroActual.setText("Mostrando: Semana actual (" + albaranes.size() + " albaranes)");
-                idsSeleccionados.clear();
-                actualizarContadorSeleccion();
+                // idsSeleccionados ya se limpia en adapter.updateData()
             });
         }).start();
     }
@@ -266,8 +266,7 @@ public class AlbaranActivity extends BaseActivity {
                 albaranesActuales = albaranes;
                 adapter.updateData(albaranes);
                 tvFiltroActual.setText("Mostrando: " + textoRango + " (" + albaranes.size() + " albaranes)");
-                idsSeleccionados.clear();
-                actualizarContadorSeleccion();
+                // idsSeleccionados ya se limpia en adapter.updateData()
             });
         }).start();
     }
@@ -275,8 +274,14 @@ public class AlbaranActivity extends BaseActivity {
     private void actualizarContadorSeleccion() {
         if (idsSeleccionados.isEmpty()) {
             btnGenerarInforme.setText("Generar informe");
+            btnSeleccionarTodos.setText("Seleccionar todos");
         } else {
             btnGenerarInforme.setText("Generar informe (" + idsSeleccionados.size() + ")");
+            if (idsSeleccionados.size() == albaranesActuales.size() && !albaranesActuales.isEmpty()) {
+                btnSeleccionarTodos.setText("Deseleccionar todos");
+            } else {
+                btnSeleccionarTodos.setText("Seleccionar todos");
+            }
         }
     }
 
@@ -422,7 +427,6 @@ public class AlbaranActivity extends BaseActivity {
         LinearLayout layoutFechaPago = dialog.findViewById(R.id.layoutFechaPago);
         ImageView imgVerAlbaran = dialog.findViewById(R.id.imgVerAlbaran);
         MaterialButton btnCerrarVer = dialog.findViewById(R.id.btnCerrarVer);
-        CheckBox cbSeleccionar = dialog.findViewById(R.id.cbSeleccionarAlbaran);
 
         tvVerNombre.setText(albaran.getNombre());
         tvVerCif.setText(albaran.getCif());
@@ -459,16 +463,6 @@ public class AlbaranActivity extends BaseActivity {
             imgVerAlbaran.setImageResource(R.drawable.ic_albaran_default);
         }
 
-        // Checkbox para selección
-        cbSeleccionar.setChecked(idsSeleccionados.contains(albaran.getId()));
-        cbSeleccionar.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                idsSeleccionados.add(albaran.getId());
-            } else {
-                idsSeleccionados.remove(albaran.getId());
-            }
-            actualizarContadorSeleccion();
-        });
 
         btnCerrarVer.setOnClickListener(v -> dialog.dismiss());
 
