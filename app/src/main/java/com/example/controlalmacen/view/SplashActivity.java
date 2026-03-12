@@ -25,7 +25,6 @@ public class SplashActivity extends AppCompatActivity {
     private int screenWidth;
     private int screenHeight;
     private int logoSize;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
