@@ -33,7 +33,6 @@ public class SplashActivity extends AppCompatActivity {
 
         ivLogo = findViewById(R.id.ivLogo);
 
-
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
@@ -41,61 +40,41 @@ public class SplashActivity extends AppCompatActivity {
 
         logoSize = (int) (400 * displayMetrics.density);
 
-        //iniciar la animacion de rebote
-
-        logoSize = (int) (400 * displayMetrics.density); 
-
-        // Iniciar la animacion de rebote
-
+        // Iniciar la animación de rebote
         handler = new Handler();
         bounceRunnable = new Runnable() {
             @Override
             public void run() {
-
                 posX += velocidadX;
                 posY += velocidadY;
 
-                //rebote en los bordes horizontales
+                // Rebote en los bordes horizontales
                 if (posX + logoSize >= screenWidth || posX <= 0) {
                     velocidadX = -velocidadX;
                 }
 
-                //rebote en los bordes verticales
+                // Rebote en los bordes verticales
                 if (posY + logoSize >= screenHeight || posY <= 0) {
                     velocidadY = -velocidadY;
                 }
 
-
                 ivLogo.setX(posX);
                 ivLogo.setY(posY);
 
-                //repetir cada 16ms
-                // volvemos a poner posicion
-                ivLogo.setX(posX);
-                ivLogo.setY(posY);
-
-                // Repetir cada 16ms
-
+                // Repetir cada 16 ms
                 handler.postDelayed(this, 16);
             }
         };
         handler.post(bounceRunnable);
 
-        //al pulsar en cualquier parte de la pantalla, ir al login
+        // Al pulsar en cualquier parte de la pantalla, ir al login
         findViewById(R.id.splashContainer).setOnClickListener(v -> irALogin());
 
-
-        //desactivar el btn atras en la splash screen
+        // Desactivar el botón atrás en la splash screen
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                //no hacer nada
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                // que no haga nada
-
+                // No hacer nada
             }
         });
     }
