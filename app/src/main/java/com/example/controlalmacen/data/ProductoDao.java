@@ -1,6 +1,7 @@
 package com.example.controlalmacen.data;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
@@ -26,4 +27,33 @@ public interface ProductoDao {
 
     @Query("SELECT * FROM productos WHERE id = :id LIMIT 1")
     Producto getById(int id);
+
+    //productos habilitados excepto los ya usados (para completar hasta 10)
+    @Query("SELECT * FROM productos " +
+            "WHERE habilitado = 1 AND id NOT IN (:idsUsados) " +
+            "ORDER BY nombre ASC " +
+            "LIMIT :limit")
+    List<Producto> getRellenoExcluyendo(List<Long> idsUsados, int limit);
+
+    //Si no hay interacciones todavia ( pilla los primeros 10 por nombre)
+    @Query("SELECT * FROM productos WHERE habilitado = 1 ORDER BY nombre ASC LIMIT 10")
+    List<Producto> getPrimeros10();
+
+    //el resto, todos habilitados excepto los del top (sin limite)
+    @Query("SELECT * FROM productos " +
+            "WHERE habilitado = 1 AND id NOT IN (:idsExcluidos) " +
+            "ORDER BY nombre ASC")
+    List<Producto> getRestoExcluyendoIds(List<Long> idsExcluidos);
+
+    //si no hay top entonces el resto a partir de los primeros 10
+    @Query("SELECT * FROM productos WHERE habilitado = 1 ORDER BY nombre ASC")
+    List<Producto> getAllHabilitadosOrdenados();
+
+
+    @Query("SELECT * FROM productos WHERE nombre = :nombre LIMIT 1")
+    Producto getByNombreExacto(String nombre);
+    @Query("SELECT * FROM productos WHERE habilitado = 1 ORDER BY nombre ASC")
+    List<Producto> getProductosActivosOrdenados();
+    @Delete
+    void delete(Producto producto);
 }

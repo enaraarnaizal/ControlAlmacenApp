@@ -33,49 +33,69 @@ public class SplashActivity extends AppCompatActivity {
 
         ivLogo = findViewById(R.id.ivLogo);
 
-        // Obtener tamaño de pantalla
+
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
         screenHeight = displayMetrics.heightPixels;
+
+        logoSize = (int) (400 * displayMetrics.density);
+
+        //iniciar la animacion de rebote
+
         logoSize = (int) (400 * displayMetrics.density); 
 
         // Iniciar la animacion de rebote
+
         handler = new Handler();
         bounceRunnable = new Runnable() {
             @Override
             public void run() {
-                // Actualizar posicion
+
                 posX += velocidadX;
                 posY += velocidadY;
 
-                // Rebote en los bordes horizontales
+                //rebote en los bordes horizontales
                 if (posX + logoSize >= screenWidth || posX <= 0) {
                     velocidadX = -velocidadX;
                 }
 
-                // Rebote en los bordes verticales
+                //rebote en los bordes verticales
                 if (posY + logoSize >= screenHeight || posY <= 0) {
                     velocidadY = -velocidadY;
                 }
 
+
+                ivLogo.setX(posX);
+                ivLogo.setY(posY);
+
+                //repetir cada 16ms
                 // volvemos a poner posicion
                 ivLogo.setX(posX);
                 ivLogo.setY(posY);
 
                 // Repetir cada 16ms
+
                 handler.postDelayed(this, 16);
             }
         };
         handler.post(bounceRunnable);
 
-        // Al pulsar en cualquier parte de la pantalla, ir al login
+        //al pulsar en cualquier parte de la pantalla, ir al login
         findViewById(R.id.splashContainer).setOnClickListener(v -> irALogin());
+
+
+        //desactivar el btn atras en la splash screen
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                //no hacer nada
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 // que no haga nada
+
             }
         });
     }

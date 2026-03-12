@@ -1,6 +1,7 @@
 package com.example.controlalmacen.data;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
@@ -37,4 +38,6 @@ public interface UsuarioDao {
     //login/perfil
     @Query("SELECT * FROM usuarios WHERE id = :id LIMIT 1")
     Usuario getById(int id);
+    @Delete
+    void delete(Usuario u);
 }

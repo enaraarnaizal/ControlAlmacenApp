@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">ControlAlmacen</string>
     <string name="toca_para_continuar">Toca la pantalla para continuar</string>
+    <string name="open_drawer">Abrir menú</string>
+    <string name="close_drawer">Cerrar menú</string>
+
 </resources>

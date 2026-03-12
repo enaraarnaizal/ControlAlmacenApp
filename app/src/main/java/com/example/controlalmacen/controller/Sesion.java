@@ -9,8 +9,9 @@ public class Sesion {
 
     public static void setUsuario(Usuario u) {
         usuario = u;
-        lastActivityMs = System.currentTimeMillis(); //arranca el contador
+        lastActivityMs = System.currentTimeMillis();
     }
+
 
     public static Usuario getUsuario() {
         return usuario;
@@ -26,7 +27,9 @@ public class Sesion {
     }
 
     public static boolean isExpired() {
-        // 10 minutos = 600000
         return usuario != null && (System.currentTimeMillis() - lastActivityMs) > 600000;
     }
 }
+
+
+

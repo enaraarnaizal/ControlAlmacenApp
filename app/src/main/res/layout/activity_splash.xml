@@ -8,14 +8,12 @@
     android:clickable="true"
     android:focusable="true">
 
-    <!-- Logo que rebota por la pantalla -->
     <ImageView
         android:id="@+id/ivLogo"
         android:layout_width="400dp"
         android:layout_height="400dp"
         android:src="@drawable/image" />
 
-    <!-- Indicación para el usuario (fija abajo) -->
     <TextView
         android:id="@+id/tvTocaPantalla"
         android:layout_width="wrap_content"

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BtnDanger" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/danger</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="BtnSuccess" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/success</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="DialogAddProducto" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="android:windowMinWidthMinor">80%</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="ChipButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">18dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+
+</resources>
