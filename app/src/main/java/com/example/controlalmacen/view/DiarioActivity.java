@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.widget.EditText;
 import android.app.Dialog;
 import android.net.Uri;
 import android.widget.CheckBox;
@@ -127,27 +127,31 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             }
 
             if (id == R.id.nav_borrar_producto) {
+
                 abrirSeleccionBorrarProducto();
                 return true;
             }
 
             if (id == R.id.nav_perfiles) {
-                startActivity(new Intent(DiarioActivity.this, PerfilActivity.class));
+                verificarAdminAntesDeEntrar(() -> {
+                    startActivity(new Intent(DiarioActivity.this, PerfilActivity.class));
+                });
                 return true;
             }
 
+
+
             if (id == R.id.nav_albaranes) {
-                // Solo el administrador puede acceder a los albaranes
-                if (Sesion.getUsuario() != null && Sesion.getUsuario().isAdministrador()) {
+                verificarAdminAntesDeEntrar(() -> {
                     startActivity(new Intent(DiarioActivity.this, AlbaranActivity.class));
-                } else {
-                    Toast.makeText(this, "Solo los administradores pueden acceder a los albaranes", Toast.LENGTH_SHORT).show();
-                }
+                });
                 return true;
             }
 
             if (id == R.id.nav_inventario) {
+                verificarAdminAntesDeEntrar(() -> {
                 Toast.makeText(this, "Inventario (pendiente)", Toast.LENGTH_SHORT).show();
+            });
                 return true;
             }
 
@@ -167,6 +171,52 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         // cargar usuarios arriba (solo para mostrar)
         loadUsers();
     }
+
+    private void verificarAdminAntesDeEntrar(Runnable accion) {
+
+     
+        if (!Sesion.getUsuario().isAdministrador()) {
+            accion.run();
+            return;
+        }
+
+        
+        if (Sesion.isAdminVerificado()) {
+            accion.run();
+            return;
+        }
+
+        
+        mostrarDialogoAdmin(accion);
+    }
+
+    private void mostrarDialogoAdmin(Runnable accion) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_confrimr_admin);
+
+        EditText etPass = dialog.findViewById(R.id.etPassAdmin);
+        Button btnConfirmar = dialog.findViewById(R.id.btnConfirmar);
+        Button btnCancelar = dialog.findViewById(R.id.btnCancelar);
+
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirmar.setOnClickListener(v -> {
+            String pass = etPass.getText().toString().trim();
+
+            if (!pass.equals(Sesion.getUsuario().getPassword())) {
+                Toast.makeText(this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Sesion.setAdminVerificado(true);
+            dialog.dismiss();
+            accion.run();
+        });
+
+        dialog.show();
+    }
+
+
 
     private void initViews() {
         //metemos acciones a todos los botones
