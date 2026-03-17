@@ -149,9 +149,11 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             }
 
             if (id == R.id.nav_inventario) {
-                verificarAdminAntesDeEntrar(() -> {
-                Toast.makeText(this, "Inventario (pendiente)", Toast.LENGTH_SHORT).show();
-            });
+                if (Sesion.getUsuario() != null && Sesion.getUsuario().isAdministrador()) {
+                    startActivity(new Intent(DiarioActivity.this, InventarioActivity.class));
+                } else {
+                    Toast.makeText(this, "Solo los administradores pueden acceder al inventario", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
 
