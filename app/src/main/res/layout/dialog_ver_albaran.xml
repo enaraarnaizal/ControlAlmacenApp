@@ -1,217 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Card con información del albarán -->
-        <androidx.cardview.widget.CardView
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Detalles del Albarán"
+                android:textColor="#111827"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnCerrarDialogoX"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="Cerrar diálogo" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E5E7EB" />
+
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="16dp">
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Información del Albarán"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#333333"
-                    android:layout_marginBottom="16dp"/>
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="260dp"
+                    app:cardBackgroundColor="#F3F4F6"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
 
-                <!-- Nombre -->
+                    <ImageView
+                        android:id="@+id/imgVerAlbaran"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="Imagen del albarán"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_albaran_default" />
+                </com.google.android.material.card.MaterialCardView>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:text="Nombre:"
-                        android:textStyle="bold"
-                        android:textColor="#666666"/>
-
-                    <TextView
-                        android:id="@+id/tvVerNombre"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Nombre del albarán"
-                        android:textColor="#333333"/>
-                </LinearLayout>
-
-                <!-- CIF -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:text="CIF:"
-                        android:textStyle="bold"
-                        android:textColor="#666666"/>
-
-                    <TextView
-                        android:id="@+id/tvVerCif"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="B12345678"
-                        android:textColor="#333333"/>
-                </LinearLayout>
-
-                <!-- Importe -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:text="Importe:"
-                        android:textStyle="bold"
-                        android:textColor="#666666"/>
-
-                    <TextView
-                        android:id="@+id/tvVerImporte"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="1.250,50 €"
-                        android:textColor="#4CAF50"
-                        android:textStyle="bold"
-                        android:textSize="16sp"/>
-                </LinearLayout>
-
-                <!-- Fecha -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:text="Fecha:"
-                        android:textStyle="bold"
-                        android:textColor="#666666"/>
-
-                    <TextView
-                        android:id="@+id/tvVerFecha"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="01/03/2026"
-                        android:textColor="#333333"/>
-                </LinearLayout>
-
-                <!-- Estado de pago -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:text="Estado:"
-                        android:textStyle="bold"
-                        android:textColor="#666666"/>
-
-                    <TextView
-                        android:id="@+id/tvVerEstado"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="PAGADO"
-                        android:textColor="#4CAF50"
-                        android:textStyle="bold"/>
+                        android:orientation="vertical"
+                        android:layout_marginEnd="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Nombre"
+                            android:textColor="#6B7280"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvVerNombre"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Nombre del albarán"
+                            android:textColor="#111827"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:text="Importe"
+                            android:textColor="#6B7280"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvVerImporte"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="20,00 €"
+                            android:textColor="#00A63E"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CIF"
+                            android:textColor="#6B7280"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvVerCif"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="B12345678"
+                            android:textColor="#111827"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            android:text="Fecha"
+                            android:textColor="#6B7280"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvVerFecha"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="19 de marzo de 2026"
+                            android:textColor="#111827"
+                            android:textSize="16sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!-- Fecha de pago (solo si está pagado) -->
-                <LinearLayout
-                    android:id="@+id/layoutFechaPago"
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone">
+                    android:layout_marginTop="20dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#D8DEE6"
+                    app:strokeWidth="1dp">
 
-                    <TextView
-                        android:layout_width="100dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Pagado el:"
-                        android:textStyle="bold"
-                        android:textColor="#666666"/>
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/tvVerFechaPago"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="28/02/2026"
-                        android:textColor="#333333"/>
-                </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Estado de Pago"
+                            android:textColor="#475569"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvVerEstado"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:text="Pendiente de Pago"
+                            android:textColor="#EA580C"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/layoutFechaPago"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pagado el"
+                                android:textColor="#6B7280"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvVerFechaPago"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="20 de marzo de 2026"
+                                android:textColor="#111827"
+                                android:textSize="15sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCerrarVer"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:layout_marginTop="18dp"
+                    android:text="Cerrar"
+                    android:textAllCaps="false"
+                    android:textColor="#111827"
+                    app:backgroundTint="#E5E7EB"
+                    app:cornerRadius="12dp" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Imagen del albarán -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Imagen del albarán"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="8dp"/>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-
-            <ImageView
-                android:id="@+id/imgVerAlbaran"
-                android:layout_width="match_parent"
-                android:layout_height="400dp"
-                android:scaleType="fitCenter"
-                android:background="#FFFFFF"
-                android:src="@android:drawable/ic_menu_gallery"
-                android:contentDescription="Imagen del albarán"/>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Botón cerrar -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCerrarVer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cerrar"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="#2196F3"/>
+        </ScrollView>
     </LinearLayout>
-</ScrollView>
 
+</androidx.cardview.widget.CardView>

@@ -20,7 +20,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.controlalmacen.R;
@@ -28,7 +28,6 @@ import com.example.controlalmacen.controller.Sesion;
 import com.example.controlalmacen.data.AppDatabase;
 import com.example.controlalmacen.model.Albaran;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -45,26 +44,43 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class AlbaranActivity extends BaseActivity {
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 
+
+public class AlbaranActivity extends BaseActivity {
     private RecyclerView rvAlbaranes;
     private AlbaranAdapter adapter;
     private TextView tvFiltroActual;
-    private LinearLayout layoutRangoFechas;
-    private Button btnFiltroMes, btnFiltroSemana, btnFiltroRango, btnGenerarInforme, btnSeleccionarTodos;
-    private Button btnFechaInicio, btnFechaFin, btnAplicarRango;
-    private FloatingActionButton fabNuevoAlbaran;
+    private View layoutRangoFechas;
+
+    private MaterialButton btnFiltroMes;
+    private MaterialButton btnFiltroSemana;
+    private MaterialButton btnFiltroRango;
+    private MaterialButton btnGenerarInforme;
+    private MaterialButton btnSeleccionarTodos;
+    private MaterialButton btnFechaInicio;
+    private MaterialButton btnFechaFin;
+    private MaterialButton btnAplicarRango;
+    private MaterialButton fabNuevoAlbaran;
+
     private ImageView btnCerrarAlbaran;
 
     private long fechaInicioSeleccionada = 0;
     private long fechaFinSeleccionada = 0;
+
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    private final SimpleDateFormat dateFormatLargo = new SimpleDateFormat("d 'de' MMMM 'de' yyyy", new Locale("es", "ES"));
 
     private Uri imagenAlbaranUri;
     private ImageView imgPreviewDialog;
 
     private List<Albaran> albaranesActuales = new ArrayList<>();
     private Set<Long> idsSeleccionados = new HashSet<>();
+
+    private String filtroVisualActual = "MES";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +98,9 @@ public class AlbaranActivity extends BaseActivity {
         inicializarVistas();
         configurarRecyclerView();
         configurarListeners();
+
+        actualizarEstiloFiltros();
+        actualizarContadorSeleccion();
 
         cargarAlbaranesMesActual();
     }
@@ -103,8 +122,15 @@ public class AlbaranActivity extends BaseActivity {
     }
 
     private void configurarRecyclerView() {
-        rvAlbaranes.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AlbaranAdapter(new ArrayList<>(), this::mostrarDialogVerAlbaran, this::onSelectionChanged);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        rvAlbaranes.setLayoutManager(gridLayoutManager);
+
+        adapter = new AlbaranAdapter(
+                new ArrayList<>(),
+                this::mostrarDialogVerAlbaran,
+                this::onSelectionChanged
+        );
+
         rvAlbaranes.setAdapter(adapter);
     }
 
@@ -114,21 +140,25 @@ public class AlbaranActivity extends BaseActivity {
     }
 
     private void configurarListeners() {
-        btnCerrarAlbaran.setOnClickListener(v -> {
-            finish(); // Vuelve a la actividad anterior (DiarioActivity)
-        });
+        btnCerrarAlbaran.setOnClickListener(v -> finish());
 
         btnFiltroMes.setOnClickListener(v -> {
+            filtroVisualActual = "MES";
+            actualizarEstiloFiltros();
             layoutRangoFechas.setVisibility(View.GONE);
             cargarAlbaranesMesActual();
         });
 
         btnFiltroSemana.setOnClickListener(v -> {
+            filtroVisualActual = "SEMANA";
+            actualizarEstiloFiltros();
             layoutRangoFechas.setVisibility(View.GONE);
             cargarAlbaranesSemanaActual();
         });
 
         btnFiltroRango.setOnClickListener(v -> {
+            filtroVisualActual = "RANGO";
+            actualizarEstiloFiltros();
             layoutRangoFechas.setVisibility(View.VISIBLE);
         });
 
@@ -161,14 +191,10 @@ public class AlbaranActivity extends BaseActivity {
         });
 
         btnSeleccionarTodos.setOnClickListener(v -> {
-            if (idsSeleccionados.size() == albaranesActuales.size()) {
-                // Deseleccionar todos
+            if (idsSeleccionados.size() == albaranesActuales.size() && !albaranesActuales.isEmpty()) {
                 adapter.limpiarSeleccion();
-                btnSeleccionarTodos.setText("Seleccionar todos");
             } else {
-                // Seleccionar todos
                 adapter.seleccionarTodos();
-                btnSeleccionarTodos.setText("Deseleccionar todos");
             }
         });
     }
@@ -272,12 +298,26 @@ public class AlbaranActivity extends BaseActivity {
     }
 
     private void actualizarContadorSeleccion() {
-        if (idsSeleccionados.isEmpty()) {
-            btnGenerarInforme.setText("Generar informe");
-            btnSeleccionarTodos.setText("Seleccionar todos");
+        boolean haySeleccion = !idsSeleccionados.isEmpty();
+
+        if (haySeleccion) {
+            btnGenerarInforme.setText("Generar Informe (" + idsSeleccionados.size() + ")");
+            btnGenerarInforme.setEnabled(true);
+            btnGenerarInforme.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#E8EEF9")));
+            btnGenerarInforme.setTextColor(Color.parseColor("#475569"));
         } else {
-            btnGenerarInforme.setText("Generar informe (" + idsSeleccionados.size() + ")");
-            if (idsSeleccionados.size() == albaranesActuales.size() && !albaranesActuales.isEmpty()) {
+            btnGenerarInforme.setText("Generar Informe");
+            btnGenerarInforme.setEnabled(false);
+            btnGenerarInforme.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#E5E7EB")));
+            btnGenerarInforme.setTextColor(Color.parseColor("#94A3B8"));
+        }
+
+        if (albaranesActuales == null || albaranesActuales.isEmpty()) {
+            btnSeleccionarTodos.setVisibility(View.GONE);
+        } else {
+            btnSeleccionarTodos.setVisibility(View.VISIBLE);
+
+            if (idsSeleccionados.size() == albaranesActuales.size()) {
                 btnSeleccionarTodos.setText("Deseleccionar todos");
             } else {
                 btnSeleccionarTodos.setText("Seleccionar todos");
@@ -410,14 +450,45 @@ public class AlbaranActivity extends BaseActivity {
         dialog.show();
     }
 
+    private void actualizarEstiloFiltros() {
+        pintarFiltro(btnFiltroMes, "MES".equals(filtroVisualActual));
+        pintarFiltro(btnFiltroSemana, "SEMANA".equals(filtroVisualActual));
+        pintarFiltro(btnFiltroRango, "RANGO".equals(filtroVisualActual));
+    }
+
+    private void pintarFiltro(MaterialButton boton, boolean seleccionado) {
+        if (seleccionado) {
+            boton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#16C55F")));
+            boton.setTextColor(Color.WHITE);
+            boton.setStrokeWidth(0);
+        } else {
+            boton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#ECECEC")));
+            boton.setTextColor(Color.parseColor("#111827"));
+            boton.setStrokeWidth(0);
+        }
+    }
+
+    private void aplicarChipEstado(TextView textView, String texto, String colorFondo, String colorTexto) {
+        textView.setText(texto);
+        textView.setTextColor(Color.parseColor(colorTexto));
+
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(Color.parseColor(colorFondo));
+        drawable.setCornerRadius(999f);
+
+        textView.setBackground(drawable);
+    }
     private void mostrarDialogVerAlbaran(Albaran albaran) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_ver_albaran);
 
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+            dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
 
+        ImageView btnCerrarDialogoX = dialog.findViewById(R.id.btnCerrarDialogoX);
         TextView tvVerNombre = dialog.findViewById(R.id.tvVerNombre);
         TextView tvVerCif = dialog.findViewById(R.id.tvVerCif);
         TextView tvVerImporte = dialog.findViewById(R.id.tvVerImporte);
@@ -433,37 +504,37 @@ public class AlbaranActivity extends BaseActivity {
 
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("es", "ES"));
         tvVerImporte.setText(currencyFormat.format(albaran.getImporte()));
-
-        tvVerFecha.setText(dateFormat.format(new Date(albaran.getFechaMs())));
+        tvVerFecha.setText(dateFormatLargo.format(new Date(albaran.getFechaMs())));
 
         if (albaran.isPagado()) {
-            tvVerEstado.setText("PAGADO");
-            tvVerEstado.setTextColor(getColor(android.R.color.holo_green_dark));
+            aplicarChipEstado(tvVerEstado, "Pagado", "#DCFCE7", "#15803D");
 
             if (albaran.getFechaPagoMs() != null) {
                 layoutFechaPago.setVisibility(View.VISIBLE);
-                tvVerFechaPago.setText(dateFormat.format(new Date(albaran.getFechaPagoMs())));
+                tvVerFechaPago.setText(dateFormatLargo.format(new Date(albaran.getFechaPagoMs())));
+            } else {
+                layoutFechaPago.setVisibility(View.GONE);
             }
         } else {
-            tvVerEstado.setText("PENDIENTE");
-            tvVerEstado.setTextColor(getColor(android.R.color.holo_orange_dark));
+            aplicarChipEstado(tvVerEstado, "Pendiente de Pago", "#FDE7D8", "#EA580C");
             layoutFechaPago.setVisibility(View.GONE);
         }
 
         if (albaran.getImagenUri() != null && !albaran.getImagenUri().isEmpty()) {
-            // Si es la imagen por defecto (android.resource), mostrar el drawable
-            if (albaran.getImagenUri().startsWith("android.resource://")) {
+            try {
+                if (albaran.getImagenUri().startsWith("android.resource://")) {
+                    imgVerAlbaran.setImageResource(R.drawable.ic_albaran_default);
+                } else {
+                    imgVerAlbaran.setImageURI(Uri.parse(albaran.getImagenUri()));
+                }
+            } catch (Exception e) {
                 imgVerAlbaran.setImageResource(R.drawable.ic_albaran_default);
-            } else {
-                // Es una imagen real de la galería o cámara
-                imgVerAlbaran.setImageURI(Uri.parse(albaran.getImagenUri()));
             }
         } else {
-            // Si no hay imagen, mostrar la imagen por defecto
             imgVerAlbaran.setImageResource(R.drawable.ic_albaran_default);
         }
 
-
+        btnCerrarDialogoX.setOnClickListener(v -> dialog.dismiss());
         btnCerrarVer.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
