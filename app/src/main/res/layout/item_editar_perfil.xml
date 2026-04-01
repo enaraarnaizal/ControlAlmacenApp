@@ -4,146 +4,185 @@
     android:layout_height="wrap_content"
     android:padding="16dp">
 
-
     <LinearLayout
+        android:layout_width="600dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:orientation="vertical"
         android:background="@drawable/bg_dialog"
-        android:padding="28dp"
-        android:layout_gravity="center"
-        android:layout_width="600dp"
-        android:layout_height="wrap_content">
-
+        android:padding="28dp">
 
         <!-- Título -->
         <TextView
-            android:text="Editar Perfil"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A1A"
-            android:layout_marginBottom="24dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="Editar Perfil"
+            android:textColor="#1A1A1A"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <!-- Foto -->
         <TextView
-            android:text="Foto del Perfil *"
-            android:textSize="15sp"
-            android:textColor="#444"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content"
+            android:text="Foto del Perfil *"
+            android:textColor="#444"
+            android:textSize="15sp" />
 
         <ImageView
             android:id="@+id/imgPreview"
-            android:src="@drawable/ic_user_blue"
             android:layout_width="150dp"
             android:layout_height="150dp"
+            android:layout_gravity="center"
             android:layout_marginTop="12dp"
-            android:layout_gravity="center"/>
-
+            android:src="@drawable/image"
+            android:scaleType="fitCenter"/>
 
         <!-- Botones de foto -->
         <LinearLayout
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnTomarFoto"
-                android:text="Tomar Foto"
-                android:backgroundTint="#1976D2"
-                android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
+                android:layout_height="wrap_content"
+                android:text="Tomar Foto"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1976D2" />
 
             <Button
                 android:id="@+id/btnSubirFoto"
-                android:text="Subir Foto"
-                android:backgroundTint="#1976D2"
-                android:textColor="#FFFFFF"
-                android:layout_marginStart="16dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Subir Foto"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1976D2" />
         </LinearLayout>
-
 
         <!-- Nombre -->
         <TextView
-            android:text="Nombre Completo *"
-            android:textSize="15sp"
-            android:textColor="#444"
-            android:layout_marginTop="24dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Nombre Completo *"
+            android:textColor="#444"
+            android:textSize="15sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilNombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etNombre"
-                android:hint="Ej: Juan García"
-                android:textColor="#000"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:hint="Ej: Juan García"
+                android:textColor="#000" />
         </com.google.android.material.textfield.TextInputLayout>
-
 
         <!-- Administrador -->
         <CheckBox
             android:id="@+id/cbAdmin"
-            android:text="Perfil de Administrador"
-            android:textColor="#000"
-            android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Perfil de Administrador"
+            android:textColor="#000" />
 
         <TextView
-            android:text="Tendrá acceso a opciones avanzadas"
-            android:textSize="12sp"
-            android:textColor="#777"
-            android:layout_marginBottom="28dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Tendrá acceso a opciones avanzadas"
+            android:textColor="#777"
+            android:textSize="12sp" />
 
+        <!-- Campos solo para admin -->
+        <LinearLayout
+            android:id="@+id/layoutAdminFields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Correo del Administrador *"
+                android:textColor="#444"
+                android:textSize="15sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ej: admin@empresa.com"
+                    android:inputType="textEmailAddress"
+                    android:textColor="#000" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Contraseña del Administrador *"
+                android:textColor="#444"
+                android:textSize="15sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Introduce la contraseña"
+                    android:inputType="textPassword"
+                    android:textColor="#000" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
 
         <!-- Botones -->
         <LinearLayout
-            android:orientation="horizontal"
-            android:gravity="end"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnCancelar"
-                android:text="Cancelar"
-                android:backgroundTint="#BDBDBD"
-                android:textColor="#000"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
+                android:layout_height="wrap_content"
+                android:text="Cancelar"
+                android:textColor="#000"
+                android:backgroundTint="#BDBDBD" />
 
             <Button
                 android:id="@+id/btnGuardar"
-                android:text="Guardar Cambios"
-                android:backgroundTint="#1976D2"
-                android:textColor="#FFFFFF"
-                android:layout_marginStart="16dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Guardar Cambios"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1976D2" />
         </LinearLayout>
-
 
     </LinearLayout>
 </ScrollView>
-

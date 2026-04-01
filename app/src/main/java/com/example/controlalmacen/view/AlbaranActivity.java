@@ -61,8 +61,13 @@ public class AlbaranActivity extends BaseActivity {
     private MaterialButton btnFiltroRango;
     private MaterialButton btnGenerarInforme;
     private MaterialButton btnSeleccionarTodos;
-    private MaterialButton btnFechaInicio;
-    private MaterialButton btnFechaFin;
+    private TextInputLayout tilFechaInicio;
+    private TextInputLayout tilFechaFin;
+    private TextInputEditText etFechaInicio;
+    private TextInputEditText etFechaFin;
+
+    private boolean editandoMascaraFecha = false;
+    private static final String MASCARA_FECHA = "dd/mm/aaaa";
     private MaterialButton btnAplicarRango;
     private MaterialButton fabNuevoAlbaran;
 
@@ -81,6 +86,9 @@ public class AlbaranActivity extends BaseActivity {
     private Set<Long> idsSeleccionados = new HashSet<>();
 
     private String filtroVisualActual = "MES";
+
+    private LinearLayout layoutEmptyAlbaranes;
+    private TextView tvEmptyTitle, tvEmptySubtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,13 +120,22 @@ public class AlbaranActivity extends BaseActivity {
         btnFiltroMes = findViewById(R.id.btnFiltroMes);
         btnFiltroSemana = findViewById(R.id.btnFiltroSemana);
         btnFiltroRango = findViewById(R.id.btnFiltroRango);
-        btnFechaInicio = findViewById(R.id.btnFechaInicio);
-        btnFechaFin = findViewById(R.id.btnFechaFin);
+        tilFechaInicio = findViewById(R.id.tilFechaInicio);
+        tilFechaFin = findViewById(R.id.tilFechaFin);
+        etFechaInicio = findViewById(R.id.etFechaInicio);
+        etFechaFin = findViewById(R.id.etFechaFin);
         btnAplicarRango = findViewById(R.id.btnAplicarRango);
         fabNuevoAlbaran = findViewById(R.id.fabNuevoAlbaran);
         btnGenerarInforme = findViewById(R.id.btnGenerarInforme);
         btnSeleccionarTodos = findViewById(R.id.btnSeleccionarTodos);
         btnCerrarAlbaran = findViewById(R.id.btnCerrarAlbaran);
+
+        layoutEmptyAlbaranes = findViewById(R.id.layoutEmptyAlbaranes);
+        tvEmptyTitle = findViewById(R.id.tvEmptyTitle);
+        tvEmptySubtitle = findViewById(R.id.tvEmptySubtitle);
+
+        configurarCampoFecha(etFechaInicio);
+        configurarCampoFecha(etFechaFin);
     }
 
     private void configurarRecyclerView() {
@@ -162,19 +179,35 @@ public class AlbaranActivity extends BaseActivity {
             layoutRangoFechas.setVisibility(View.VISIBLE);
         });
 
-        btnFechaInicio.setOnClickListener(v -> mostrarSelectorFecha(true));
-        btnFechaFin.setOnClickListener(v -> mostrarSelectorFecha(false));
+        tilFechaInicio.setStartIconOnClickListener(v -> mostrarSelectorFecha(true));
+        tilFechaFin.setStartIconOnClickListener(v -> mostrarSelectorFecha(false));
 
         btnAplicarRango.setOnClickListener(v -> {
-            if (fechaInicioSeleccionada > 0 && fechaFinSeleccionada > 0) {
-                if (fechaInicioSeleccionada > fechaFinSeleccionada) {
-                    Toast.makeText(this, "La fecha de inicio no puede ser posterior a la fecha de fin", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                cargarAlbaranesRango(fechaInicioSeleccionada, fechaFinSeleccionada);
-            } else {
-                Toast.makeText(this, "Seleccione ambas fechas", Toast.LENGTH_SHORT).show();
+            tilFechaInicio.setError(null);
+            tilFechaFin.setError(null);
+
+            long inicio = obtenerFechaDesdeCampo(etFechaInicio, false);
+            long fin = obtenerFechaDesdeCampo(etFechaFin, true);
+
+            if (inicio == -1) {
+                tilFechaInicio.setError("Fecha inválida");
+                return;
             }
+
+            if (fin == -1) {
+                tilFechaFin.setError("Fecha inválida");
+                return;
+            }
+
+            if (inicio > fin) {
+                Toast.makeText(this, "La fecha de inicio no puede ser posterior a la fecha de fin", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            fechaInicioSeleccionada = inicio;
+            fechaFinSeleccionada = fin;
+
+            cargarAlbaranesRango(inicio, fin);
         });
 
         fabNuevoAlbaran.setOnClickListener(v -> mostrarDialogNuevoAlbaran());
@@ -201,6 +234,7 @@ public class AlbaranActivity extends BaseActivity {
 
     private void mostrarSelectorFecha(boolean esInicio) {
         Calendar calendar = Calendar.getInstance();
+
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 this,
                 (view, year, month, dayOfMonth) -> {
@@ -211,23 +245,193 @@ public class AlbaranActivity extends BaseActivity {
                         selectedDate.set(Calendar.HOUR_OF_DAY, 0);
                         selectedDate.set(Calendar.MINUTE, 0);
                         selectedDate.set(Calendar.SECOND, 0);
+                        selectedDate.set(Calendar.MILLISECOND, 0);
+
                         fechaInicioSeleccionada = selectedDate.getTimeInMillis();
-                        btnFechaInicio.setText(dateFormat.format(selectedDate.getTime()));
+                        etFechaInicio.setText(dateFormat.format(selectedDate.getTime()).toLowerCase(Locale.ROOT));
+                        moverCursorAlFinalEditable(etFechaInicio);
+                        tilFechaInicio.setError(null);
                     } else {
                         selectedDate.set(Calendar.HOUR_OF_DAY, 23);
                         selectedDate.set(Calendar.MINUTE, 59);
                         selectedDate.set(Calendar.SECOND, 59);
+                        selectedDate.set(Calendar.MILLISECOND, 999);
+
                         fechaFinSeleccionada = selectedDate.getTimeInMillis();
-                        btnFechaFin.setText(dateFormat.format(selectedDate.getTime()));
+                        etFechaFin.setText(dateFormat.format(selectedDate.getTime()).toLowerCase(Locale.ROOT));
+                        moverCursorAlFinalEditable(etFechaFin);
+                        tilFechaFin.setError(null);
                     }
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
+
         datePickerDialog.show();
     }
 
+    private void configurarCampoFecha(TextInputEditText editText) {
+        if (editText == null) return;
+
+        editText.setText(MASCARA_FECHA);
+        editText.setSelection(0);
+
+        editText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                moverCursorAlPrimerHueco(editText);
+            }
+        });
+
+        editText.setOnClickListener(v -> moverCursorAlPrimerHueco(editText));
+
+        editText.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                if (editandoMascaraFecha) return;
+
+                editandoMascaraFecha = true;
+
+                String digitos = extraerDigitos(s.toString());
+                if (digitos.length() > 8) {
+                    digitos = digitos.substring(0, 8);
+                }
+
+                String textoConMascara = aplicarMascaraFecha(digitos);
+                editText.setText(textoConMascara);
+                moverCursorAlPrimerHueco(editText);
+
+                editandoMascaraFecha = false;
+            }
+        });
+
+        editText.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == android.view.KeyEvent.ACTION_DOWN &&
+                    keyCode == android.view.KeyEvent.KEYCODE_DEL) {
+
+                String actual = editText.getText() != null ? editText.getText().toString() : MASCARA_FECHA;
+                String digitos = extraerDigitos(actual);
+
+                if (!digitos.isEmpty()) {
+                    digitos = digitos.substring(0, digitos.length() - 1);
+
+                    editandoMascaraFecha = true;
+                    String nuevo = aplicarMascaraFecha(digitos);
+                    editText.setText(nuevo);
+                    moverCursorAlPrimerHueco(editText);
+                    editandoMascaraFecha = false;
+                }
+
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private String extraerDigitos(String texto) {
+        return texto.replaceAll("[^0-9]", "");
+    }
+
+    private String aplicarMascaraFecha(String digitos) {
+        char[] base = MASCARA_FECHA.toCharArray();
+        int[] posiciones = {0, 1, 3, 4, 6, 7, 8, 9};
+
+        for (int i = 0; i < digitos.length() && i < posiciones.length; i++) {
+            base[posiciones[i]] = digitos.charAt(i);
+        }
+
+        return new String(base);
+    }
+
+    private void moverCursorAlPrimerHueco(TextInputEditText editText) {
+        if (editText == null || editText.getText() == null) return;
+
+        String texto = editText.getText().toString();
+        int posicion = texto.indexOf('d');
+
+        if (posicion == -1) posicion = texto.indexOf('m');
+        if (posicion == -1) posicion = texto.indexOf('a');
+        if (posicion == -1) posicion = texto.length();
+
+        editText.setSelection(Math.max(0, Math.min(posicion, texto.length())));
+    }
+
+    private void moverCursorAlFinalEditable(TextInputEditText editText) {
+        if (editText == null || editText.getText() == null) return;
+        editText.setSelection(editText.getText().length());
+    }
+
+    private long obtenerFechaDesdeCampo(TextInputEditText editText, boolean finDelDia) {
+        if (editText == null || editText.getText() == null) return -1;
+
+        String texto = editText.getText().toString().trim().toLowerCase(Locale.ROOT);
+
+        if (texto.contains("d") || texto.contains("m") || texto.contains("a")) {
+            return -1;
+        }
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            sdf.setLenient(false);
+
+            Date fecha = sdf.parse(texto);
+            if (fecha == null) return -1;
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(fecha);
+
+            if (finDelDia) {
+                cal.set(Calendar.HOUR_OF_DAY, 23);
+                cal.set(Calendar.MINUTE, 59);
+                cal.set(Calendar.SECOND, 59);
+                cal.set(Calendar.MILLISECOND, 999);
+            } else {
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+            }
+
+            return cal.getTimeInMillis();
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    private long parseFechaManual(String texto, boolean finDelDia) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            sdf.setLenient(false);
+
+            Date fecha = sdf.parse(texto);
+            if (fecha == null) return -1;
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(fecha);
+
+            if (finDelDia) {
+                cal.set(Calendar.HOUR_OF_DAY, 23);
+                cal.set(Calendar.MINUTE, 59);
+                cal.set(Calendar.SECOND, 59);
+                cal.set(Calendar.MILLISECOND, 999);
+            } else {
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+            }
+
+            return cal.getTimeInMillis();
+        } catch (Exception e) {
+            return -1;
+        }
+    }
     private void cargarAlbaranesMesActual() {
         new Thread(() -> {
             Calendar calendar = Calendar.getInstance();
@@ -250,7 +454,7 @@ public class AlbaranActivity extends BaseActivity {
                 albaranesActuales = albaranes;
                 adapter.updateData(albaranes);
                 tvFiltroActual.setText("Mostrando: Mes actual (" + albaranes.size() + " albaranes)");
-                // idsSeleccionados ya se limpia en adapter.updateData()
+                actualizarEstadoVacio(albaranes);
             });
         }).start();
     }
@@ -277,7 +481,7 @@ public class AlbaranActivity extends BaseActivity {
                 albaranesActuales = albaranes;
                 adapter.updateData(albaranes);
                 tvFiltroActual.setText("Mostrando: Semana actual (" + albaranes.size() + " albaranes)");
-                // idsSeleccionados ya se limpia en adapter.updateData()
+                actualizarEstadoVacio(albaranes);
             });
         }).start();
     }
@@ -292,7 +496,7 @@ public class AlbaranActivity extends BaseActivity {
                 albaranesActuales = albaranes;
                 adapter.updateData(albaranes);
                 tvFiltroActual.setText("Mostrando: " + textoRango + " (" + albaranes.size() + " albaranes)");
-                // idsSeleccionados ya se limpia en adapter.updateData()
+                actualizarEstadoVacio(albaranes);
             });
         }).start();
     }
@@ -448,6 +652,27 @@ public class AlbaranActivity extends BaseActivity {
         });
 
         dialog.show();
+    }
+
+    private void actualizarEstadoVacio(List<Albaran> albaranes) {
+        boolean estaVacio = (albaranes == null || albaranes.isEmpty());
+
+        if (layoutEmptyAlbaranes != null) {
+            layoutEmptyAlbaranes.setVisibility(estaVacio ? View.VISIBLE : View.GONE);
+        }
+
+        if (rvAlbaranes != null) {
+            rvAlbaranes.setVisibility(estaVacio ? View.GONE : View.VISIBLE);
+        }
+
+        if (btnSeleccionarTodos != null) {
+            btnSeleccionarTodos.setVisibility(estaVacio ? View.GONE : View.VISIBLE);
+        }
+
+        if (btnGenerarInforme != null) {
+            btnGenerarInforme.setEnabled(!estaVacio);
+            btnGenerarInforme.setAlpha(estaVacio ? 0.55f : 1f);
+        }
     }
 
     private void actualizarEstiloFiltros() {

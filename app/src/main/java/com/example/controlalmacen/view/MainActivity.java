@@ -49,16 +49,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hacerLogin(Usuario u) {
-
-        // SI ES ADMIN
         Sesion.setUsuario(u);
-        Sesion.setAdminVerificado(false); // admin aún no verificado
-        startActivity(new Intent(this, DiarioActivity.class));
-        finish();
+        Sesion.setAdminVerificado(false);
+        Sesion.touch();
 
-
-        // SI NO ES ADMIN
-        Sesion.setUsuario(u);
         startActivity(new Intent(this, DiarioActivity.class));
         finish();
     }
