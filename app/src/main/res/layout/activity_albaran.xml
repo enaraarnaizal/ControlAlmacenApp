@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F3F4F6">
+
+    <!-- Cabecera -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="#DDEFE3"
+        android:gravity="center_vertical"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp">
+
+        <ImageView
+            android:id="@+id/imgAlbaranHeader"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_receipt_filled"
+            android:contentDescription="Icono albaranes"
+            app:tint="#16C55F" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Gestión de Albaranes"
+            android:textColor="#111827"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btnCerrarAlbaran"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_close"
+            android:contentDescription="Cerrar" />
+    </LinearLayout>
+
+    <!-- Contenido -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Filtros -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filtros:"
+                    android:textColor="#374151"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="10dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFiltroMes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:text="Mes Actual"
+                    android:textAllCaps="false"
+                    android:textSize="13sp"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="14dp"
+                    app:backgroundTint="#16C55F"
+                    app:strokeWidth="0dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFiltroSemana"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="8dp"
+                    android:minWidth="0dp"
+                    android:text="Semana Actual"
+                    android:textAllCaps="false"
+                    android:textSize="13sp"
+                    android:textColor="#111827"
+                    app:cornerRadius="14dp"
+                    app:backgroundTint="#ECECEC"
+                    app:strokeWidth="0dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFiltroRango"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:minWidth="0dp"
+                    android:text="Rango Personalizado"
+                    android:textAllCaps="false"
+                    android:textSize="13sp"
+                    android:textColor="#111827"
+                    app:cornerRadius="14dp"
+                    app:backgroundTint="#ECECEC"
+                    app:strokeWidth="0dp" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Rango -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/layoutRangoFechas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="#EAF6EF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#A7E3BF"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/imgCalendarioRango"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/ic_calendar"
+                    android:contentDescription="Calendario"
+                    app:tint="#16C55F" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilFechaInicio"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="#D8DEE6"
+                    app:endIconMode="custom"
+                    app:endIconTint="#16C55F">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFechaInicio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:digits="0123456789"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:text="dd/mm/aaaa"
+                        android:textColor="#111827"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:text="hasta"
+                    android:textColor="#374151"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilFechaFin"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="#D8DEE6"
+                    app:endIconTint="#16C55F">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFechaFin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:digits="0123456789"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:text="dd/mm/aaaa"
+                        android:textColor="#111827"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAplicarRango"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="12dp"
+                    android:text="Aplicar"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    app:backgroundTint="#16C55F"
+                    app:cornerRadius="12dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Texto del filtro -->
+        <TextView
+            android:id="@+id/tvFiltroActual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Mostrando: Mes actual"
+            android:textColor="#6B7280"
+            android:textSize="13sp" />
+
+        <!-- Acciones -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/fabNuevoAlbaran"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="10dp"
+                android:text="+  Nuevo Albarán"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:backgroundTint="#16C55F"
+                app:cornerRadius="14dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGenerarInforme"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Generar Informe"
+                android:textAllCaps="false"
+                android:textColor="#94A3B8"
+                app:backgroundTint="#E5E7EB"
+                app:cornerRadius="14dp" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSeleccionarTodos"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="6dp"
+            android:text="Seleccionar todos"
+            android:textAllCaps="false"
+            android:textColor="#64748B"
+            android:textSize="12sp"
+            app:backgroundTint="@android:color/transparent"
+            app:rippleColor="#22000000"
+            app:strokeWidth="0dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="#D8DEE6" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="6dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAlbaranes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="24dp" />
+
+            <LinearLayout
+                android:id="@+id/layoutEmptyAlbaranes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_receipt_filled"
+                    android:contentDescription="Sin albaranes"
+                    app:tint="#C7CDD6" />
+
+                <TextView
+                    android:id="@+id/tvEmptyTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="No hay albaranes en este periodo"
+                    android:textColor="#64748B"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/tvEmptySubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Haz clic en &quot;Nuevo Albarán&quot; para añadir uno"
+                    android:textColor="#64748B"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,10 +1,13 @@
 package com.example.controlalmacen.view;
 
+
+import java.util.Locale;
+import android.widget.EditText;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,7 +20,7 @@ import android.widget.Toast;
 import android.app.Dialog;
 import android.net.Uri;
 import android.widget.CheckBox;
-import android.widget.ImageView;
+
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -43,7 +46,7 @@ import com.example.controlalmacen.data.UsuarioDao;
 import com.example.controlalmacen.model.Interaccion;
 import com.example.controlalmacen.model.Producto;
 import com.example.controlalmacen.model.Usuario;
-import com.google.android.material.navigation.NavigationView;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +56,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 
-import com.example.controlalmacen.view.SeleccionProductoAdapter;
 
 public class DiarioActivity extends BaseActivity implements ProductoAdapter.Listener { //se implementa el archivo de baseactivity para controlar los 10misn de inactividad
 
@@ -64,7 +66,8 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
     private LinearLayout userContainer; //menu de arriba de usuarios
     private Button btnTodos, btnLimiteMinimo, btnStockNormal; //botones
     private ImageView imgSalir; //para el logout
-
+    private EditText etBuscarProducto;
+    private String textoBusqueda = "";
     //listado de usuarios
     private List<Usuario> usuarios = new ArrayList<>();
     private Usuario selectedUser; // siempre sera el logueado
@@ -79,16 +82,24 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
     private Uri imagenProductoUri;
     private ImageView imgPreviewDialog;
 
+
+//menu
+    private LinearLayout itemEditarProducto, itemDeshabilitarProducto, itemBorrarProducto;
+    private LinearLayout itemPerfiles, itemAlbaranes, itemInventario;
+    private ImageView btnCerrarDrawer;
+    private TextView tvSoloAdmins;
+    private ImageView iconLockPerfiles, iconLockAlbaranes, iconLockInventario;
+
+    private LinearLayout layoutAdminRestricted;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diario);
 
-        //para q el menu sea la pantalla principal
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //para canectar el menu lateral con la toolbar para el icono del menu se abra y se cierre
         drawerLayout = findViewById(R.id.drawerLayout);
         toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
@@ -97,68 +108,199 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.navigationView);
-        Menu menu = navigationView.getMenu();
-
-        //desactivar o activar dependiendo el rol con el que te hayas logueado
-        boolean esAdmin = Sesion.getUsuario().isAdministrador();
-        menu.findItem(R.id.nav_perfiles).setEnabled(esAdmin);
-        menu.findItem(R.id.nav_albaranes).setEnabled(esAdmin);
-        menu.findItem(R.id.nav_inventario).setEnabled(esAdmin);
-
-
-        // Listener del menu lateral
-        navigationView.setNavigationItemSelectedListener(item -> {
-            drawerLayout.closeDrawers();
-
-            int id = item.getItemId();
-
-            if (id == R.id.nav_editar_producto) {
-                abrirSeleccionEditarProducto();
-                return true;
-            }
-
-            if (id == R.id.nav_deshabilitar_producto) {
-                abrirSeleccionDeshabilitarProducto();
-                return true;
-            }
-
-            if (id == R.id.nav_borrar_producto) {
-                abrirSeleccionBorrarProducto();
-                return true;
-            }
-
-            if (id == R.id.nav_perfiles) {
-                startActivity(new Intent(DiarioActivity.this, PerfilActivity.class));
-                return true;
-            }
-
-            if (id == R.id.nav_albaranes) {
-                Toast.makeText(this, "Albaranes (pendiente)", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-
-            if (id == R.id.nav_inventario) {
-                Toast.makeText(this, "Inventario (pendiente)", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-
-            return true;
-        });
+        inicializarDrawerCustom();
 
         initViews();
 
-        // usuario fijo, el de sesion (no se puede cambiar)
         selectedUser = Sesion.getUsuario();
 
-        // filtro por defecto
+        actualizarMenuSegunUsuario();
+
         selectFilter("Todos", btnTodos);
 
-        setupRecycler(); //lista visual de productos
+        setupRecycler();
 
-        // cargar usuarios arriba (solo para mostrar)
         loadUsers();
     }
+
+    private void inicializarDrawerCustom() {
+        btnCerrarDrawer = findViewById(R.id.btnCerrarDrawer);
+
+        itemEditarProducto = findViewById(R.id.itemEditarProducto);
+        itemDeshabilitarProducto = findViewById(R.id.itemDeshabilitarProducto);
+        itemBorrarProducto = findViewById(R.id.itemBorrarProducto);
+
+        itemPerfiles = findViewById(R.id.itemPerfiles);
+        itemAlbaranes = findViewById(R.id.itemAlbaranes);
+        itemInventario = findViewById(R.id.itemInventario);
+
+        tvSoloAdmins = findViewById(R.id.tvSoloAdmins);
+        layoutAdminRestricted = findViewById(R.id.layoutAdminRestricted);
+
+        iconLockPerfiles = findViewById(R.id.iconLockPerfiles);
+        iconLockAlbaranes = findViewById(R.id.iconLockAlbaranes);
+        iconLockInventario = findViewById(R.id.iconLockInventario);
+
+        btnCerrarDrawer.setOnClickListener(v -> drawerLayout.closeDrawers());
+
+        itemEditarProducto.setOnClickListener(v -> {
+            drawerLayout.closeDrawers();
+            abrirSeleccionEditarProducto();
+        });
+
+        itemDeshabilitarProducto.setOnClickListener(v -> {
+            drawerLayout.closeDrawers();
+            abrirSeleccionDeshabilitarProducto();
+        });
+
+        itemBorrarProducto.setOnClickListener(v -> {
+            drawerLayout.closeDrawers();
+            abrirSeleccionBorrarProducto();
+        });
+
+        itemPerfiles.setOnClickListener(v -> {
+            if (Sesion.getUsuario() != null && Sesion.getUsuario().isAdministrador()) {
+                drawerLayout.closeDrawers();
+                verificarAdminAntesDeEntrar(() ->
+                        startActivity(new Intent(DiarioActivity.this, PerfilActivity.class))
+                );
+            } else {
+                Toast.makeText(this, "Solo administradores", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        itemAlbaranes.setOnClickListener(v -> {
+            if (Sesion.getUsuario() != null && Sesion.getUsuario().isAdministrador()) {
+                drawerLayout.closeDrawers();
+                verificarAdminAntesDeEntrar(() ->
+                        startActivity(new Intent(DiarioActivity.this, AlbaranActivity.class))
+                );
+            } else {
+                Toast.makeText(this, "Solo administradores", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        itemInventario.setOnClickListener(v -> {
+            if (Sesion.getUsuario() != null && Sesion.getUsuario().isAdministrador()) {
+                drawerLayout.closeDrawers();
+                verificarAdminAntesDeEntrar(() ->
+                        startActivity(new Intent(DiarioActivity.this, InventarioActivity.class))
+                );
+            } else {
+                Toast.makeText(this, "Solo administradores", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        actualizarMenuSegunUsuario();
+        loadUsers();
+    }
+    private void cambiarUsuario(Usuario nuevoUsuario) {
+        if (nuevoUsuario == null) {
+            return;
+        }
+
+        // Si pulsa el mismo usuario, no hacemos nada
+        if (selectedUser != null && selectedUser.getId() == nuevoUsuario.getId()) {
+            return;
+        }
+
+        // Cambiamos el usuario activo real de la sesión
+        selectedUser = nuevoUsuario;
+        Sesion.setUsuario(nuevoUsuario);
+
+        // Muy importante: al cambiar de perfil, la verificación admin se reinicia
+        Sesion.setAdminVerificado(false);
+
+        // Reiniciar tiempo de sesión por interacción
+        Sesion.touch();
+
+        // Opcional pero recomendable: limpiar búsqueda al cambiar de perfil
+        textoBusqueda = "";
+        if (etBuscarProducto != null) {
+            etBuscarProducto.setText("");
+        }
+
+        // Refrescar barra superior, menú lateral y productos
+        actualizarMenuSegunUsuario();
+        displayUsers();
+        cargarProductos(selectedUser.getId());
+    }
+    private void actualizarMenuSegunUsuario() {
+        if (Sesion.getUsuario() == null) {
+            return;
+        }
+
+        boolean esAdmin = Sesion.getUsuario().isAdministrador();
+
+        if (esAdmin) {
+            tvSoloAdmins.setVisibility(View.VISIBLE);
+            layoutAdminRestricted.setVisibility(View.GONE);
+
+            itemPerfiles.setVisibility(View.VISIBLE);
+            itemAlbaranes.setVisibility(View.VISIBLE);
+            itemInventario.setVisibility(View.VISIBLE);
+
+            iconLockPerfiles.setVisibility(View.VISIBLE);
+            iconLockAlbaranes.setVisibility(View.VISIBLE);
+            iconLockInventario.setVisibility(View.VISIBLE);
+        } else {
+            tvSoloAdmins.setVisibility(View.GONE);
+            layoutAdminRestricted.setVisibility(View.VISIBLE);
+
+            itemPerfiles.setVisibility(View.GONE);
+            itemAlbaranes.setVisibility(View.GONE);
+            itemInventario.setVisibility(View.GONE);
+        }
+    }
+    private void verificarAdminAntesDeEntrar(Runnable accion) {
+
+     
+        if (!Sesion.getUsuario().isAdministrador()) {
+            accion.run();
+            return;
+        }
+
+        
+        if (Sesion.isAdminVerificado()) {
+            accion.run();
+            return;
+        }
+
+        
+        mostrarDialogoAdmin(accion);
+    }
+
+    private void mostrarDialogoAdmin(Runnable accion) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_confrimr_admin);
+
+        EditText etPass = dialog.findViewById(R.id.etPassAdmin);
+        Button btnConfirmar = dialog.findViewById(R.id.btnConfirmar);
+        Button btnCancelar = dialog.findViewById(R.id.btnCancelar);
+
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirmar.setOnClickListener(v -> {
+            String pass = etPass.getText().toString().trim();
+
+            if (!pass.equals(Sesion.getUsuario().getPassword())) {
+                Toast.makeText(this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Sesion.setAdminVerificado(true);
+            dialog.dismiss();
+            accion.run();
+        });
+
+        dialog.show();
+    }
+
+
 
     private void initViews() {
         //metemos acciones a todos los botones
@@ -168,6 +310,27 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         btnLimiteMinimo = findViewById(R.id.btnLimiteMinimo);
         btnStockNormal = findViewById(R.id.btnStockNormal);
 
+        etBuscarProducto = findViewById(R.id.etBuscarProducto);
+
+        etBuscarProducto.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                textoBusqueda = s == null ? "" : s.toString().trim();
+
+                if (selectedUser != null) {
+                    cargarProductos(selectedUser.getId());
+                }
+            }
+        });
+
         imgSalir = findViewById(R.id.imgSalir);
 
         //aqui para los filtros tmb
@@ -175,9 +338,11 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         btnLimiteMinimo.setOnClickListener(v -> selectFilter("Límite Mínimo", btnLimiteMinimo));
         btnStockNormal.setOnClickListener(v -> selectFilter("Stock Normal", btnStockNormal));
 
+
+
         // Logout (cerrar sesion y volver al login, mainactivity)
         imgSalir.setOnClickListener(v -> {
-            Sesion.setUsuario(null);
+            Sesion.clear();
             Intent i = new Intent(DiarioActivity.this, MainActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
@@ -303,10 +468,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 tvUserName.setTextColor(ContextCompat.getColor(this, R.color.gray_text));
             }
 
-            //bloquear el cambio de usuario
-            userView.setOnClickListener(v ->
-                    Toast.makeText(this, "No puedes cambiar de usuario sin cerrar sesión", Toast.LENGTH_SHORT).show()
-            );
+            userView.setOnClickListener(v -> cambiarUsuario(u));
 
             userContainer.addView(userView);
         }
@@ -385,6 +547,10 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
 
     private boolean pasaFiltro(Producto p) {
+        if (!coincideBusqueda(p)) {
+            return false;
+        }
+
         switch (selectedFilter) {
             case "Límite Mínimo":
                 return p.isHabilitado()
@@ -398,7 +564,19 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 return true;
         }
     }
+    private boolean coincideBusqueda(Producto p) {
+        if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
+            return true;
+        }
 
+        if (p.getNombre() == null) {
+            return false;
+        }
+
+        return p.getNombre()
+                .toLowerCase(Locale.ROOT)
+                .contains(textoBusqueda.trim().toLowerCase(Locale.ROOT));
+    }
     //listener del adapter
 
     @Override

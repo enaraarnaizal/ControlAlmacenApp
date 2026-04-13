@@ -49,15 +49,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hacerLogin(Usuario u) {
-
-        // SI ES ADMIN → pedir contraseña antes de entrar
-        if (u.isAdministrador()) {
-            mostrarDialogoAdmin(u);
-            return;
-        }
-
-        // SI NO ES ADMIN → entrar directo
         Sesion.setUsuario(u);
+        Sesion.setAdminVerificado(false);
+        Sesion.touch();
+
         startActivity(new Intent(this, DiarioActivity.class));
         finish();
     }

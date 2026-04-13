@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,8 +16,8 @@ import java.util.List;
 
 public class UsuarioAdminAdapter extends RecyclerView.Adapter<UsuarioAdminAdapter.ViewHolder> {
 
-    private List<Usuario> lista;
-    private Listener listener;
+    private final List<Usuario> lista;
+    private final Listener listener;
 
     public interface Listener {
         void onEditar(Usuario u);
@@ -32,7 +33,7 @@ public class UsuarioAdminAdapter extends RecyclerView.Adapter<UsuarioAdminAdapte
 
     @Override
     public int getItemViewType(int position) {
-        return (lista.get(position) == null) ? 0 : 1; // 0 = botón "+", 1 = usuario
+        return (lista.get(position) == null) ? 0 : 1;
     }
 
     @Override
@@ -47,25 +48,30 @@ public class UsuarioAdminAdapter extends RecyclerView.Adapter<UsuarioAdminAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder h, int position) {
-
         Usuario u = lista.get(position);
 
         if (u == null) {
-            // Botón "+"
             h.itemView.setOnClickListener(v -> listener.onNuevo());
             return;
         }
 
-        // Nombre y rol
         h.tvNombre.setText(u.getNombre());
-        h.tvRol.setText(u.isAdministrador() ? "Administrador" : "Usuario");
 
-        // Mostrar capa gris si está deshabilitado
+        if (u.isAdministrador()) {
+            h.tvRol.setVisibility(View.VISIBLE);
+            h.tvRol.setText("Administrador");
+            h.badgeAdmin.setVisibility(View.VISIBLE);
+        } else {
+            h.tvRol.setVisibility(View.GONE);
+            h.badgeAdmin.setVisibility(View.GONE);
+        }
+
+        h.imgUsuario.setImageResource(R.drawable.ic_user_white);
+
         if (h.capaDeshabilitado != null) {
             h.capaDeshabilitado.setVisibility(u.isHabilitado() ? View.GONE : View.VISIBLE);
         }
 
-        // Listeners
         h.btnEditar.setOnClickListener(v -> listener.onEditar(u));
         h.btnDisable.setOnClickListener(v -> listener.onDeshabilitar(u));
         h.btnDelete.setOnClickListener(v -> listener.onBorrar(u));
@@ -79,20 +85,24 @@ public class UsuarioAdminAdapter extends RecyclerView.Adapter<UsuarioAdminAdapte
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvNombre, tvRol;
+        ImageView imgUsuario;
+        View badgeAdmin;
         ImageButton btnEditar, btnDisable, btnDelete;
         View capaDeshabilitado;
 
         ViewHolder(View v, int viewType) {
             super(v);
 
-            if (viewType == 1) { // Usuario real
+            if (viewType == 1) {
                 tvNombre = v.findViewById(R.id.tvNombre);
                 tvRol = v.findViewById(R.id.tvRol);
+                imgUsuario = v.findViewById(R.id.imgUsuario);
+                badgeAdmin = v.findViewById(R.id.badgeAdmin);
+
                 btnEditar = v.findViewById(R.id.btnEditar);
                 btnDisable = v.findViewById(R.id.btnDisable);
                 btnDelete = v.findViewById(R.id.btnDelete);
 
-                // Capa gris
                 capaDeshabilitado = v.findViewById(R.id.capaDeshabilitado);
             }
         }

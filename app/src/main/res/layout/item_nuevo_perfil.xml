@@ -6,29 +6,31 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="6dp">
+    app:cardElevation="2dp"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="210dp"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:background="@drawable/bg_dashed_area">
 
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
             android:src="@drawable/ic_add"
-            app:tint="#2F80ED" />
+            app:tint="#8B94A7" />
 
         <TextView
-            android:text="Nuevo Perfil"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Nuevo Perfil"
+            android:textColor="#6B7280"
+            android:textSize="16sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
