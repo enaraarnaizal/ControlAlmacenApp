@@ -702,13 +702,18 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             final String nombreFinal = nombre;
 
             new Thread(() -> {
-                AppDatabase db = AppDatabase.getInstance(this);
+                AppDatabase db = AppDatabase.getInstance(this);// Comprobamos si ya existe un producto con ese nombre (insensible a mayúsculas)
+                Producto existente = db.productoDao().getByNombreIgnoreCase(nombreFinal);
+                if (existente != null) {
+                    runOnUiThread(() -> tilNombre.setError(getString(R.string.error_nombre_duplicado)));
+                    return;
+                }
 
                 Producto nuevo = new Producto(nombreFinal, imgFinal, cantidadFinal, cantidadMinFinal, habilitadoFinal);
                 db.productoDao().insert(nuevo);
 
                 runOnUiThread(() -> { //volvemos al hilo principal para asi actualizar la interfaz
-                    Toast.makeText(this, "Producto añadido correctamente", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.msg_producto_anadido), Toast.LENGTH_SHORT).show();
                     dialog.dismiss(); //cerramos el formulario
 
                     //recargamos la lista de productos
@@ -1088,7 +1093,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
                 Producto existente = db.productoDao().getByNombreExacto(nombreFinal);
                 if (existente != null && existente.getId() != producto.getId()) {
-                    runOnUiThread(() -> tilNombre.setError("Ya existe otro producto con ese nombre"));
+                    runOnUiThread(() -> tilNombre.setError(getString(R.string.error_nombre_duplicado)));
                     return;
                 }
 

@@ -52,6 +52,10 @@ public interface ProductoDao {
 
     @Query("SELECT * FROM productos WHERE nombre = :nombre LIMIT 1")
     Producto getByNombreExacto(String nombre);
+
+    // Nuevo: búsqueda insensible a mayúsculas para detectar duplicados
+    @Query("SELECT * FROM productos WHERE LOWER(nombre) = LOWER(:nombre) LIMIT 1")
+    Producto getByNombreIgnoreCase(String nombre);
     @Query("SELECT * FROM productos WHERE habilitado = 1 ORDER BY nombre ASC")
     List<Producto> getProductosActivosOrdenados();
     @Delete

@@ -4,4 +4,8 @@
     <string name="open_drawer">Abrir menú</string>
     <string name="close_drawer">Cerrar menú</string>
 
+    <!-- Mensajes añadidos para validación de nombre duplicado y confirmación -->
+    <string name="error_nombre_duplicado">Ya existe un producto con ese nombre</string>
+    <string name="msg_producto_anadido">Producto añadido correctamente</string>
+
 </resources>
