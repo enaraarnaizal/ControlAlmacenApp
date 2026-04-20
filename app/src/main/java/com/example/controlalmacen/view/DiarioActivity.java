@@ -390,7 +390,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                         imgPreviewDialog.setImageURI(imagenProductoUri);
                         imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);                    }
                 } else {
-                    Toast.makeText(this, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "No se pudo sacar la foto", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -972,7 +972,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         //cambiamos textos de los botones para el form de edicion
         btnGuardar.setText("Guardar cambios");
         btnCancelar.setText("Cancelar");
-        btnTomarFoto.setText("Tomar foto");
+        btnTomarFoto.setText("Sacar foto");
         btnSubirFoto.setText("Subir foto");
 
         //precargar datos del producto

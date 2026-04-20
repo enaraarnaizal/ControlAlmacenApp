@@ -803,7 +803,7 @@ public class AlbaranActivity extends BaseActivity {
                         imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     }
                 } else {
-                    Toast.makeText(this, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "No se pudo sacar la foto", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -820,4 +820,3 @@ public class AlbaranActivity extends BaseActivity {
                 }
             });
 }
-

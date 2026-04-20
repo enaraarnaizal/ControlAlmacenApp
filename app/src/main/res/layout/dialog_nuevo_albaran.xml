@@ -116,7 +116,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tomar foto"
+                android:text="Sacar foto"
                 android:layout_marginEnd="8dp"
                 app:icon="@android:drawable/ic_menu_camera"
                 app:iconGravity="start"/>
@@ -156,4 +156,3 @@
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
-
