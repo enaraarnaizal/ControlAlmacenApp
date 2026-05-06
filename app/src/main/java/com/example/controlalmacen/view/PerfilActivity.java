@@ -1,15 +1,31 @@
 package com.example.controlalmacen.view;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,9 +41,15 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+
 public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAdapter.Listener {
 
     private RecyclerView rvUsuarios;
+
+    private Uri imagenPerfilUri;
+    private ImageView imgPreviewPerfilDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +95,116 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
             }
         }).start();
     }
+    private final ActivityResultLauncher<String> galeriaPerfilLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    Uri uriInterna = copiarImagenPerfilAInterno(uri);
+
+                    if (uriInterna != null) {
+                        imagenPerfilUri = uriInterna;
+
+                        if (imgPreviewPerfilDialog != null) {
+                            imgPreviewPerfilDialog.setImageURI(uriInterna);
+                            imgPreviewPerfilDialog.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        }
+                    }
+                }
+            });
+
+    private final ActivityResultLauncher<Uri> camaraPerfilLauncher =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(), success -> {
+                if (success && imagenPerfilUri != null) {
+                    if (imgPreviewPerfilDialog != null) {
+                        imgPreviewPerfilDialog.setImageURI(imagenPerfilUri);
+                        imgPreviewPerfilDialog.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    }
+                } else {
+                    Toast.makeText(this, "No se pudo sacar la foto", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+    private final ActivityResultLauncher<String> permisoCamaraPerfilLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) {
+                    Uri uri = crearUriParaFotoPerfil();
+
+                    if (uri != null) {
+                        imagenPerfilUri = uri;
+                        camaraPerfilLauncher.launch(uri);
+                    }
+                } else {
+                    Toast.makeText(this, "Debes conceder permiso de cámara", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private Uri crearUriParaFotoPerfil() {
+        try {
+            File dir = new File(getFilesDir(), "perfiles");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            File file = File.createTempFile("perfil_", ".jpg", dir);
+
+            return FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",
+                    file
+            );
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error preparando la cámara", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
+    private Uri copiarImagenPerfilAInterno(Uri uriOrigen) {
+        try {
+            File dir = new File(getFilesDir(), "perfiles");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            File file = File.createTempFile("perfil_galeria_", ".jpg", dir);
+
+            try (InputStream in = getContentResolver().openInputStream(uriOrigen);
+                 FileOutputStream out = new FileOutputStream(file)) {
+
+                if (in == null) {
+                    return null;
+                }
+
+                byte[] buffer = new byte[4096];
+                int leido;
+
+                while ((leido = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, leido);
+                }
+            }
+
+            return FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",
+                    file
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error copiando la imagen", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
 
     private void mostrarEditarPerfil(Usuario usuario) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.item_editar_perfil);
 
         ImageView imgPreview = dialog.findViewById(R.id.imgPreview);
+        imgPreviewPerfilDialog = imgPreview;
+        imagenPerfilUri = null;
+
         TextInputEditText etNombre = dialog.findViewById(R.id.etNombre);
         CheckBox cbAdmin = dialog.findViewById(R.id.cbAdmin);
 
@@ -98,6 +224,11 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
             etNombre.setText(usuario.getNombre());
             cbAdmin.setChecked(usuario.isAdministrador());
 
+            if (usuario.getFotoUri() != null && !usuario.getFotoUri().isEmpty()) {
+                imagenPerfilUri = Uri.parse(usuario.getFotoUri());
+                imgPreview.setImageURI(imagenPerfilUri);
+                imgPreview.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            }
             if (usuario.isAdministrador()) {
                 layoutAdminFields.setVisibility(View.VISIBLE);
 
@@ -128,6 +259,26 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
         });
 
         btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnTomarFoto.setOnClickListener(v -> {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED) {
+
+                Uri uri = crearUriParaFotoPerfil();
+
+                if (uri != null) {
+                    imagenPerfilUri = uri;
+                    camaraPerfilLauncher.launch(uri);
+                }
+
+            } else {
+                permisoCamaraPerfilLauncher.launch(Manifest.permission.CAMERA);
+            }
+        });
+
+        btnSubirFoto.setOnClickListener(v -> {
+            galeriaPerfilLauncher.launch("image/*");
+        });
 
         btnGuardar.setOnClickListener(v -> {
             String nombre = etNombre.getText() != null ? etNombre.getText().toString().trim() : "";
@@ -163,15 +314,25 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
             new Thread(() -> {
                 AppDatabase db = AppDatabase.getInstance(this);
 
+                String fotoFinal = imagenPerfilUri != null ? imagenPerfilUri.toString() : null;
+
+
                 if (usuario == null) {
                     String emailFinal = admin ? email : null;
                     String passwordFinal = admin ? password : null;
 
-                    Usuario nuevo = new Usuario(nombre, null, admin, passwordFinal, emailFinal, true);
+                    String imagenFinal = imagenPerfilUri != null ? imagenPerfilUri.toString() : null;
+
+                    Usuario nuevo = new Usuario(nombre, fotoFinal, admin, passwordFinal, emailFinal, true);
                     db.usuarioDao().insert(nuevo);
+
                 } else {
                     usuario.setNombre(nombre);
                     usuario.setAdministrador(admin);
+
+                    if (imagenPerfilUri != null) {
+                        usuario.setFotoUri(imagenPerfilUri.toString());
+                    }
 
                     if (admin) {
                         usuario.setEmail(email);
@@ -181,6 +342,9 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
                         usuario.setPassword(null);
                     }
 
+                    if (imagenPerfilUri != null) {
+                        usuario.setFotoUri(imagenPerfilUri.toString());
+                    }
                     db.usuarioDao().update(usuario);
                 }
 
@@ -205,52 +369,109 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
         mostrarEditarPerfil(u);
     }
 
+
     @Override
     public void onDeshabilitar(Usuario u) {
-        String mensaje = u.isHabilitado()
-                ? "¿Seguro que deseas DESHABILITAR este perfil?"
-                : "¿Seguro que deseas HABILITAR este perfil?";
+        Dialog dialog = new Dialog(this, R.style.DialogRedondeado);
+        dialog.setContentView(R.layout.dialog_deshabilitar_perfil);
 
-        new AlertDialog.Builder(this)
-                .setTitle("Confirmar acción")
-                .setMessage(mensaje)
-                .setPositiveButton("Sí", (d, w) -> {
-                    new Thread(() -> {
-                        AppDatabase db = AppDatabase.getInstance(this);
+        TextView btnCerrarDialog = dialog.findViewById(R.id.btnCerrarDialogDeshabilitar);
+        TextView tvTitulo = dialog.findViewById(R.id.tvTituloDeshabilitarPerfil);
+        TextView tvMensaje = dialog.findViewById(R.id.tvMensajeDeshabilitarPerfil);
+        Button btnCancelar = dialog.findViewById(R.id.btnCancelarDeshabilitarPerfil);
+        Button btnConfirmar = dialog.findViewById(R.id.btnConfirmarDeshabilitarPerfil);
 
-                        u.setHabilitado(!u.isHabilitado());
-                        db.usuarioDao().update(u);
+        boolean estaHabilitado = u.isHabilitado();
 
-                        runOnUiThread(() -> {
-                            Toast.makeText(this,
-                                    u.isHabilitado() ? "Perfil habilitado" : "Perfil deshabilitado",
-                                    Toast.LENGTH_SHORT).show();
+        if (estaHabilitado) {
+            tvTitulo.setText("Deshabilitar Perfil");
+            tvMensaje.setText("¿Deseas deshabilitar el perfil de \""
+                    + u.getNombre()
+                    + "\"? Este usuario no podrá acceder a la aplicación.");
+            btnConfirmar.setText("Deshabilitar");
+        } else {
+            tvTitulo.setText("Habilitar Perfil");
+            tvMensaje.setText("¿Deseas habilitar el perfil de \""
+                    + u.getNombre()
+                    + "\"? Este usuario volverá a poder acceder a la aplicación.");
+            btnConfirmar.setText("Habilitar");
+        }
 
-                            cargarUsuarios();
-                        });
-                    }).start();
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
+        btnCerrarDialog.setOnClickListener(v -> dialog.dismiss());
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirmar.setOnClickListener(v -> {
+            new Thread(() -> {
+                AppDatabase db = AppDatabase.getInstance(this);
+
+                u.setHabilitado(!u.isHabilitado());
+                db.usuarioDao().update(u);
+
+                runOnUiThread(() -> {
+                    dialog.dismiss();
+
+                    Toast.makeText(
+                            this,
+                            u.isHabilitado() ? "Perfil habilitado" : "Perfil deshabilitado",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    cargarUsuarios();
+                });
+            }).start();
+        });
+
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            int ancho = (int) (500 * getResources().getDisplayMetrics().density);
+
+            dialog.getWindow().setLayout(
+                    ancho,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
     }
 
     @Override
     public void onBorrar(Usuario u) {
-        new AlertDialog.Builder(this)
-                .setTitle("Eliminar perfil")
-                .setMessage("¿Seguro que deseas borrar a " + u.getNombre() + "?")
-                .setPositiveButton("Sí", (d, w) -> {
-                    new Thread(() -> {
-                        AppDatabase db = AppDatabase.getInstance(this);
-                        db.usuarioDao().delete(u);
+        Dialog dialog = new Dialog(this, R.style.DialogRedondeado);
+        dialog.setContentView(R.layout.dialog_borrar_perfil);
 
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Perfil eliminado", Toast.LENGTH_SHORT).show();
-                            cargarUsuarios();
-                        });
-                    }).start();
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
+        TextView btnCerrarDialog = dialog.findViewById(R.id.btnCerrarDialog);
+        TextView tvMensaje = dialog.findViewById(R.id.tvMensajeBorrarPerfil);
+        Button btnCancelar = dialog.findViewById(R.id.btnCancelarBorrarPerfil);
+        Button btnBorrar = dialog.findViewById(R.id.btnConfirmarBorrarPerfil);
+
+        tvMensaje.setText("¿Estás seguro de que deseas eliminar el perfil de \""
+                + u.getNombre()
+                + "\"? Esta acción no se puede deshacer.");
+
+        btnCerrarDialog.setOnClickListener(v -> dialog.dismiss());
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnBorrar.setOnClickListener(v -> {
+            new Thread(() -> {
+                AppDatabase db = AppDatabase.getInstance(this);
+                db.usuarioDao().delete(u);
+
+                runOnUiThread(() -> {
+                    dialog.dismiss();
+                    Toast.makeText(this, "Perfil eliminado", Toast.LENGTH_SHORT).show();
+                    cargarUsuarios();
+                });
+            }).start();
+        });
+
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            int ancho = (int) (500 * getResources().getDisplayMetrics().density);
+
+            dialog.getWindow().setLayout(
+                    ancho,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
     }
 }

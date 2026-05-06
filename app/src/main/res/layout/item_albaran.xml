@@ -122,7 +122,7 @@
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            app:backgroundTint="#2F80ED"
+            app:backgroundTint="@color/success"
             app:cornerRadius="14dp" />
     </LinearLayout>
 

@@ -19,10 +19,11 @@
 
         <ImageView
             android:id="@+id/imgUserIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:layout_gravity="center"
-            android:scaleType="centerInside"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
             android:contentDescription="Usuario"
             android:src="@drawable/ic_user_white" />
     </FrameLayout>

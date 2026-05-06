@@ -6,4 +6,8 @@
     <files-path
         name="albaranes"
         path="albaranes/" />
+
+    <files-path
+        name="perfiles"
+        path="perfiles/" />
 </paths>

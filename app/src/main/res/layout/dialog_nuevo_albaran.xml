@@ -115,21 +115,23 @@
                 android:id="@+id/btnTomarFotoAlbaran"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:text="Sacar foto"
-                android:layout_marginEnd="8dp"
+                app:backgroundTint="@color/success"
                 app:icon="@android:drawable/ic_menu_camera"
-                app:iconGravity="start"/>
+                app:iconGravity="start" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSubirFotoAlbaran"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:text="Subir foto"
-                android:layout_marginStart="8dp"
+                app:backgroundTint="@color/success"
                 app:icon="@android:drawable/ic_menu_gallery"
-                app:iconGravity="start"/>
+                app:iconGravity="start" />
         </LinearLayout>
 
         <!-- Botones de acción -->
@@ -144,8 +146,9 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cancelar"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:textColor="#4CAF50"
+                android:text="Cancelar" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGuardarAlbaran"

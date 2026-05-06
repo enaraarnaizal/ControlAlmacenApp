@@ -1,8 +1,10 @@
 package com.example.controlalmacen.view;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,18 +33,64 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.VH> {
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_usuario, parent, false);
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_usuario, parent, false);
+
         return new VH(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         Usuario u = usuarios.get(position);
-        holder.tvNombre.setText(u.getNombre());
 
+        holder.tvNombre.setText(u.getNombre());
         holder.imgFoto.setImageResource(R.drawable.ic_user_white);
 
-        holder.itemView.setOnClickListener(v -> listener.onClick(u));
+        // Estado inicial, importante por si RecyclerView reutiliza vistas
+        holder.itemView.setScaleX(1f);
+        holder.itemView.setScaleY(1f);
+        holder.itemView.setElevation(6f);
+
+        holder.itemView.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+
+                // Cuando toca la tarjeta con el dedo
+                case MotionEvent.ACTION_DOWN:
+                    v.animate()
+                            .scaleX(1.08f)
+                            .scaleY(1.08f)
+                            .translationY(-6f)
+                            .setDuration(130)
+                            .setInterpolator(new OvershootInterpolator())
+                            .start();
+                    return true;
+
+                // Cuando levanta el dedo, vuelve al tamaño normal y hace login
+                case MotionEvent.ACTION_UP:
+                    v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .translationY(0f)
+                            .setDuration(120)
+                            .start();
+
+                    v.performClick();
+                    listener.onClick(u);
+                    return true;
+
+                // Si arrastra el dedo fuera o se cancela el toque
+                case MotionEvent.ACTION_CANCEL:
+                    v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .translationY(0f)
+                            .setDuration(120)
+                            .start();
+                    return true;
+            }
+
+            return false;
+        });
     }
 
     @Override
@@ -56,8 +104,12 @@ public class UsuarioAdapter extends RecyclerView.Adapter<UsuarioAdapter.VH> {
 
         VH(@NonNull View itemView) {
             super(itemView);
+
             imgFoto = itemView.findViewById(R.id.imgFoto);
             tvNombre = itemView.findViewById(R.id.tvNombre);
+
+            itemView.setClickable(true);
+            itemView.setFocusable(true);
         }
     }
 }

@@ -40,4 +40,6 @@ public interface UsuarioDao {
     Usuario getById(int id);
     @Delete
     void delete(Usuario u);
+
+
 }

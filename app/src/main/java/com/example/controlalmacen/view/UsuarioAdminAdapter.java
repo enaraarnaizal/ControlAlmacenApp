@@ -13,6 +13,7 @@ import com.example.controlalmacen.R;
 import com.example.controlalmacen.model.Usuario;
 
 import java.util.List;
+import android.net.Uri;
 
 public class UsuarioAdminAdapter extends RecyclerView.Adapter<UsuarioAdminAdapter.ViewHolder> {
 
@@ -66,10 +67,32 @@ public class UsuarioAdminAdapter extends RecyclerView.Adapter<UsuarioAdminAdapte
             h.badgeAdmin.setVisibility(View.GONE);
         }
 
-        h.imgUsuario.setImageResource(R.drawable.ic_user_white);
+        if (u.getFotoUri() != null && !u.getFotoUri().isEmpty()) {
+            try {
+                h.imgUsuario.setImageURI(Uri.parse(u.getFotoUri()));
+                h.imgUsuario.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                h.imgUsuario.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                h.imgUsuario.setPadding(0, 0, 0, 0);
+            } catch (Exception e) {
+                h.imgUsuario.setImageResource(R.drawable.ic_user_blue);
+                h.imgUsuario.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                h.imgUsuario.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                h.imgUsuario.setPadding(0, 0, 0, 0);
+            }
+        } else {
+            h.imgUsuario.setImageResource(R.drawable.ic_user_blue);
+            h.imgUsuario.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            h.imgUsuario.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            h.imgUsuario.setPadding(0, 0, 0, 0);
+        }
 
         if (h.capaDeshabilitado != null) {
             h.capaDeshabilitado.setVisibility(u.isHabilitado() ? View.GONE : View.VISIBLE);
+        }
+        if (u.isHabilitado()) {
+            h.btnDisable.setBackgroundResource(R.drawable.btn_round_yellow);
+        } else {
+            h.btnDisable.setBackgroundResource(R.drawable.btn_round_green);
         }
 
         h.btnEditar.setOnClickListener(v -> listener.onEditar(u));

@@ -275,7 +275,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
     }
 
     private void mostrarDialogoAdmin(Runnable accion) {
-        Dialog dialog = new Dialog(this);
+        Dialog dialog = new Dialog(this, R.style.DialogRedondeado);
         dialog.setContentView(R.layout.dialog_confrimr_admin);
 
         EditText etPass = dialog.findViewById(R.id.etPassAdmin);
@@ -356,13 +356,13 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
         adapter = new ProductoAdapter(this);
 
-        GridLayoutManager glm = new GridLayoutManager(this, 2); //para poner que haya dos columnas
+        GridLayoutManager glm = new GridLayoutManager(this, 3); //para poner que haya dos columnas
         glm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 int type = adapter.getItemViewType(position);
                 // Header ocupa 2 columnas
-                if (type == 2) return 2;
+                if (type == 2) return 3;
                 //lo demas 1 (los productos)
                 return 1;
             }
@@ -432,9 +432,24 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             UsuarioDao dao = AppDatabase.getInstance(this).usuarioDao();
             usuarios = dao.getUsuariosActivos();
 
+            // Actualizar también el usuario seleccionado con los datos nuevos de Room
+            if (selectedUser != null) {
+                for (Usuario u : usuarios) {
+                    if (u.getId() == selectedUser.getId()) {
+                        selectedUser = u;
+                        Sesion.setUsuario(u);
+                        break;
+                    }
+                }
+            }
+
             runOnUiThread(() -> {
+                actualizarMenuSegunUsuario();
                 displayUsers();
-                if (selectedUser != null) cargarProductos(selectedUser.getId());
+
+                if (selectedUser != null) {
+                    cargarProductos(selectedUser.getId());
+                }
             });
         }).start();
     }
@@ -452,20 +467,38 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             FrameLayout userCircle = userView.findViewById(R.id.userCircle);
             ImageView imgUserIcon = userView.findViewById(R.id.imgUserIcon);
 
-            tvUserName.setText(u.getNombre()); //para poner el nombre debajo de cada icono
+            tvUserName.setText(u.getNombre());
 
-            boolean isSelected = (selectedUser != null && u.getId() == selectedUser.getId()); //marcar el usuario con el que esta
+            boolean isSelected = selectedUser != null && u.getId() == selectedUser.getId();
+            boolean tieneFoto = u.getFotoUri() != null && !u.getFotoUri().isEmpty();
 
             if (isSelected) {
                 userCard.setBackgroundResource(R.drawable.bg_card_selected);
-                userCircle.setBackgroundResource(R.drawable.bg_circle_white);
-                imgUserIcon.setImageResource(R.drawable.ic_user_blue);
                 tvUserName.setTextColor(ContextCompat.getColor(this, R.color.white));
             } else {
                 userCard.setBackgroundResource(R.drawable.bg_card_unselected);
-                userCircle.setBackgroundResource(R.drawable.bg_circle_blue);
-                imgUserIcon.setImageResource(R.drawable.ic_user_white);
                 tvUserName.setTextColor(ContextCompat.getColor(this, R.color.gray_text));
+            }
+
+            if (tieneFoto) {
+                try {
+                    // Quitamos cualquier fondo azul/blanco del círculo
+                    userCircle.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+
+                    // Limpiamos el icono anterior para que no quede detrás
+                    imgUserIcon.setImageDrawable(null);
+                    imgUserIcon.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    imgUserIcon.setPadding(0, 0, 0, 0);
+
+                    // Cargamos la foto real
+                    imgUserIcon.setImageURI(Uri.parse(u.getFotoUri()));
+                    imgUserIcon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+                } catch (Exception e) {
+                    ponerIconoUsuarioPorDefecto(userCircle, imgUserIcon, isSelected);
+                }
+            } else {
+                ponerIconoUsuarioPorDefecto(userCircle, imgUserIcon, isSelected);
             }
 
             userView.setOnClickListener(v -> cambiarUsuario(u));
@@ -473,6 +506,22 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             userContainer.addView(userView);
         }
     }
+
+    private void ponerIconoUsuarioPorDefecto(FrameLayout userCircle, ImageView imgUserIcon, boolean isSelected) {
+        imgUserIcon.setImageDrawable(null);
+        imgUserIcon.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        imgUserIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        imgUserIcon.setPadding(0, 0, 0, 0);
+
+        if (isSelected) {
+            userCircle.setBackgroundResource(R.drawable.bg_circle_white);
+            imgUserIcon.setImageResource(R.drawable.ic_user_blue);
+        } else {
+            userCircle.setBackgroundResource(R.drawable.bg_circle_blue);
+            imgUserIcon.setImageResource(R.drawable.ic_user_white);
+        }
+    }
+
 
     // cambior el filtro q esta puesto por default
     private void selectFilter(String filter, Button selectedButton) {
@@ -878,43 +927,65 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         }).start();
     }
     private void mostrarConfirmacionDeshabilitar(Producto producto) {
-        String mensaje;
+        Dialog dialog = new Dialog(this, R.style.DialogRedondeado);
+        dialog.setContentView(R.layout.dialog_deshabilitar_producto);
 
-        if (producto.isHabilitado()) {
-            mensaje = "¿Seguro que quieres deshabilitar el producto \"" + producto.getNombre() + "\"?";
-        } else {
-            mensaje = "El producto \"" + producto.getNombre() + "\" ya está deshabilitado.";
-        }
+        TextView btnCerrarDialog = dialog.findViewById(R.id.btnCerrarDialogDeshabilitarProducto);
+        TextView tvTitulo = dialog.findViewById(R.id.tvTituloDeshabilitarProducto);
+        TextView tvMensaje = dialog.findViewById(R.id.tvMensajeDeshabilitarProducto);
+        Button btnCancelar = dialog.findViewById(R.id.btnCancelarDeshabilitarProducto);
+        Button btnConfirmar = dialog.findViewById(R.id.btnConfirmarDeshabilitarProducto);
 
         if (!producto.isHabilitado()) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Producto ya deshabilitado")
-                    .setMessage(mensaje)
-                    .setPositiveButton("Aceptar", null)
-                    .show();
-            return;
+            tvTitulo.setText("Producto ya deshabilitado");
+            tvMensaje.setText("El producto \""
+                    + producto.getNombre()
+                    + "\" ya está deshabilitado.");
+
+            btnConfirmar.setText("Aceptar");
+            btnCancelar.setVisibility(View.GONE);
+
+            btnConfirmar.setOnClickListener(v -> dialog.dismiss());
+        } else {
+            tvTitulo.setText("Deshabilitar Producto");
+            tvMensaje.setText("¿Deseas deshabilitar el producto \""
+                    + producto.getNombre()
+                    + "\"? Dejará de aparecer como producto activo.");
+
+            btnConfirmar.setText("Deshabilitar");
+
+            btnConfirmar.setOnClickListener(v -> {
+                new Thread(() -> {
+                    AppDatabase db = AppDatabase.getInstance(this);
+
+                    producto.setHabilitado(false);
+                    db.productoDao().update(producto);
+
+                    runOnUiThread(() -> {
+                        dialog.dismiss();
+                        Toast.makeText(this, "Producto deshabilitado correctamente", Toast.LENGTH_SHORT).show();
+
+                        if (selectedUser != null) {
+                            cargarProductos(selectedUser.getId());
+                        }
+                    });
+                }).start();
+            });
         }
 
-        new AlertDialog.Builder(this)
-                .setTitle("Deshabilitar producto")
-                .setMessage(mensaje)
-                .setNegativeButton("Cancelar", null)
-                .setPositiveButton("Deshabilitar", (dialog, which) -> {
-                    new Thread(() -> {
-                        AppDatabase db = AppDatabase.getInstance(this);
+        btnCerrarDialog.setOnClickListener(v -> dialog.dismiss());
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
 
-                        producto.setHabilitado(false);
-                        db.productoDao().update(producto);
+        dialog.show();
 
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Producto deshabilitado correctamente", Toast.LENGTH_SHORT).show();
-                            if (selectedUser != null) {
-                                cargarProductos(selectedUser.getId());
-                            }
-                        });
-                    }).start();
-                })
-                .show();
+        if (dialog.getWindow() != null) {
+            int ancho = (int) (500 * getResources().getDisplayMetrics().density);
+
+            dialog.getWindow().setLayout(
+                    ancho,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
     }
 
     private void abrirSeleccionBorrarProducto() {
@@ -926,24 +997,47 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
     }
 
     private void mostrarConfirmacionBorrar(Producto producto) {
-        new AlertDialog.Builder(this)
-                .setTitle("Borrar producto")
-                .setMessage("¿Seguro que quieres borrar el producto \"" + producto.getNombre() + "\"? Esta acción no se puede deshacer.")
-                .setNegativeButton("Cancelar", null)
-                .setPositiveButton("Borrar", (dialog, which) -> {
-                    new Thread(() -> {
-                        AppDatabase db = AppDatabase.getInstance(this);
-                        db.productoDao().delete(producto);
+        Dialog dialog = new Dialog(this, R.style.DialogRedondeado);
+        dialog.setContentView(R.layout.dialog_borrar_producto);
 
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Producto borrado correctamente", Toast.LENGTH_SHORT).show();
-                            if (selectedUser != null) {
-                                cargarProductos(selectedUser.getId());
-                            }
-                        });
-                    }).start();
-                })
-                .show();
+        TextView btnCerrarDialog = dialog.findViewById(R.id.btnCerrarDialogBorrarProducto);
+        TextView tvMensaje = dialog.findViewById(R.id.tvMensajeBorrarProducto);
+        Button btnCancelar = dialog.findViewById(R.id.btnCancelarBorrarProducto);
+        Button btnBorrar = dialog.findViewById(R.id.btnConfirmarBorrarProducto);
+
+        tvMensaje.setText("¿Estás seguro de que deseas eliminar el producto \""
+                + producto.getNombre()
+                + "\"? Esta acción no se puede deshacer.");
+
+        btnCerrarDialog.setOnClickListener(v -> dialog.dismiss());
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnBorrar.setOnClickListener(v -> {
+            new Thread(() -> {
+                AppDatabase db = AppDatabase.getInstance(this);
+                db.productoDao().delete(producto);
+
+                runOnUiThread(() -> {
+                    dialog.dismiss();
+                    Toast.makeText(this, "Producto borrado correctamente", Toast.LENGTH_SHORT).show();
+
+                    if (selectedUser != null) {
+                        cargarProductos(selectedUser.getId());
+                    }
+                });
+            }).start();
+        });
+
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            int ancho = (int) (500 * getResources().getDisplayMetrics().density);
+
+            dialog.getWindow().setLayout(
+                    ancho,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
     }
 
     private void mostrarDialogEditarProducto(Producto producto) {

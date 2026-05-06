@@ -28,5 +28,10 @@
         <item name="android:insetBottom">0dp</item>
     </style>
 
+    <style name="DialogRedondeado" parent="@android:style/Theme.Material.Light.Dialog.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
 
 </resources>

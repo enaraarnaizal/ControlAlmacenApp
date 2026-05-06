@@ -32,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
         // grid para poner/ver tablet >>>>>>> main
         rvPerfiles.setLayoutManager(new GridLayoutManager(this, 3));
-
+        rvPerfiles.setClipToPadding(false);
+        rvPerfiles.setClipChildren(false);
         cargarPerfiles();
     }
 
