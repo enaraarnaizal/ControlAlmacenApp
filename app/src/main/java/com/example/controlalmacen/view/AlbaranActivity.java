@@ -59,6 +59,7 @@ public class AlbaranActivity extends BaseActivity {
     private MaterialButton btnFiltroMes;
     private MaterialButton btnFiltroSemana;
     private MaterialButton btnFiltroRango;
+    private MaterialButton btnFiltroTodos; // nuevo
     private MaterialButton btnGenerarInforme;
     private MaterialButton btnSeleccionarTodos;
     private TextInputLayout tilFechaInicio;
@@ -110,7 +111,10 @@ public class AlbaranActivity extends BaseActivity {
         actualizarEstiloFiltros();
         actualizarContadorSeleccion();
 
-        cargarAlbaranesMesActual();
+        // Mostrar todos por defecto
+        filtroVisualActual = "TODOS";
+        actualizarEstiloFiltros();
+        cargarAlbaranesTodos();
     }
 
     private void inicializarVistas() {
@@ -120,6 +124,7 @@ public class AlbaranActivity extends BaseActivity {
         btnFiltroMes = findViewById(R.id.btnFiltroMes);
         btnFiltroSemana = findViewById(R.id.btnFiltroSemana);
         btnFiltroRango = findViewById(R.id.btnFiltroRango);
+        btnFiltroTodos = findViewById(R.id.btnFiltroTodos); // nuevo
         tilFechaInicio = findViewById(R.id.tilFechaInicio);
         tilFechaFin = findViewById(R.id.tilFechaFin);
         etFechaInicio = findViewById(R.id.etFechaInicio);
@@ -177,6 +182,13 @@ public class AlbaranActivity extends BaseActivity {
             filtroVisualActual = "RANGO";
             actualizarEstiloFiltros();
             layoutRangoFechas.setVisibility(View.VISIBLE);
+        });
+
+        btnFiltroTodos.setOnClickListener(v -> {
+            filtroVisualActual = "TODOS";
+            actualizarEstiloFiltros();
+            layoutRangoFechas.setVisibility(View.GONE);
+            cargarAlbaranesTodos();
         });
 
         tilFechaInicio.setStartIconOnClickListener(v -> mostrarSelectorFecha(true));
@@ -501,6 +513,20 @@ public class AlbaranActivity extends BaseActivity {
         }).start();
     }
 
+    private void cargarAlbaranesTodos() {
+        new Thread(() -> {
+            AppDatabase db = AppDatabase.getInstance(this);
+            List<Albaran> albaranes = db.albaranDao().getAll();
+
+            runOnUiThread(() -> {
+                albaranesActuales = albaranes;
+                adapter.updateData(albaranes);
+                tvFiltroActual.setText("Mostrando: Todos (" + albaranes.size() + " albaranes)");
+                actualizarEstadoVacio(albaranes);
+            });
+        }).start();
+    }
+
     private void actualizarContadorSeleccion() {
         boolean haySeleccion = !idsSeleccionados.isEmpty();
 
@@ -676,6 +702,7 @@ public class AlbaranActivity extends BaseActivity {
     }
 
     private void actualizarEstiloFiltros() {
+        pintarFiltro(btnFiltroTodos, "TODOS".equals(filtroVisualActual));
         pintarFiltro(btnFiltroMes, "MES".equals(filtroVisualActual));
         pintarFiltro(btnFiltroSemana, "SEMANA".equals(filtroVisualActual));
         pintarFiltro(btnFiltroRango, "RANGO".equals(filtroVisualActual));
