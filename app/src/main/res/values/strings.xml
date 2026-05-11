@@ -8,4 +8,20 @@
     <string name="error_nombre_duplicado">Ya existe un producto con ese nombre</string>
     <string name="msg_producto_anadido">Producto añadido correctamente</string>
 
+    <!-- Strings para Inventario -->
+    <string name="inventario_titulo">Inventario Total</string>
+    <string name="sin_stock_label">Sin stock</string>
+    <string name="mostrando_inventario_total">Mostrando: inventario total</string>
+    <string name="todos_label">Todos</string>
+    <string name="limite_minimo_label">Límite mínimo</string>
+    <string name="deshabilitados_label">Deshabilitados</string>
+
+    <!-- Strings adicionales de cabecera/tabla -->
+    <string name="total_productos">Total Productos</string>
+    <string name="unidades_totales">Unidades Totales</string>
+    <string name="producto_label">Producto</string>
+    <string name="cantidad_actual_label">Cantidad Actual</string>
+    <string name="cantidad_minima_label">Cantidad Mínima</string>
+    <string name="estado_label">Estado</string>
+
 </resources>

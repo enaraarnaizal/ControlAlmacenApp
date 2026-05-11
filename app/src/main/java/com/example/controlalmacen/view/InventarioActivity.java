@@ -28,6 +28,7 @@ public class InventarioActivity extends BaseActivity {
     private TextView tvLimiteMinimo;
     private TextView tvDeshabilitados;
     private TextView tvFiltroActual;
+    private TextView tvSinStock; // nuevo
 
     private MaterialButton btnFiltroTodos;
     private MaterialButton btnFiltroMinimo;
@@ -71,6 +72,7 @@ public class InventarioActivity extends BaseActivity {
         tvLimiteMinimo = findViewById(R.id.tvLimiteMinimoValor);
         tvDeshabilitados = findViewById(R.id.tvDeshabilitadosValor);
         tvFiltroActual = findViewById(R.id.tvFiltroActualInventario);
+        tvSinStock = findViewById(R.id.tvSinStockValor); // nuevo
 
         btnFiltroTodos = findViewById(R.id.btnFiltroTodosInventario);
         btnFiltroMinimo = findViewById(R.id.btnFiltroMinimoInventario);
@@ -163,6 +165,7 @@ public class InventarioActivity extends BaseActivity {
         int unidadesTotales = 0;
         int totalEnMinimo = 0;
         int totalDeshabilitados = 0;
+        int totalSinStock = 0; // nuevo
 
         for (Producto p : productosTotales) {
             unidadesTotales += p.getCantidad();
@@ -174,12 +177,17 @@ public class InventarioActivity extends BaseActivity {
             if (!p.isHabilitado()) {
                 totalDeshabilitados++;
             }
+
+            if (p.getCantidad() == 0) { // contar sin stock
+                totalSinStock++;
+            }
         }
 
         tvTotalProductos.setText(String.valueOf(totalProductos));
         tvUnidadesTotales.setText(String.valueOf(unidadesTotales));
         tvLimiteMinimo.setText(String.valueOf(totalEnMinimo));
         tvDeshabilitados.setText(String.valueOf(totalDeshabilitados));
+        tvSinStock.setText(String.valueOf(totalSinStock)); // nuevo
     }
 
     private void aplicarFiltro() {

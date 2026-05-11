@@ -72,7 +72,14 @@ public class InventarioAdapter extends RecyclerView.Adapter<InventarioAdapter.VH
                 && producto.getCantidadMin() > 0
                 && producto.getCantidad() <= producto.getCantidadMin();
 
-        if (!producto.isHabilitado()) {
+        boolean sinStock = producto.getCantidad() == 0; // nuevo
+
+        if (sinStock) {
+            // aplicar estilo rojo para sin stock
+            holder.rowContainer.setBackgroundColor(Color.parseColor("#FEE2E2"));
+            holder.tvCantidadActual.setTextColor(Color.parseColor("#EF4444"));
+            aplicarChip(holder.tvEstado, "Sin stock", "#FEE2E2", "#EF4444");
+        } else if (!producto.isHabilitado()) {
             holder.rowContainer.setBackgroundColor(Color.parseColor("#F8FAFC"));
             holder.tvCantidadActual.setTextColor(Color.parseColor("#4B5563"));
             aplicarChip(holder.tvEstado, "Deshabilitado", "#E5E7EB", "#4B5563");

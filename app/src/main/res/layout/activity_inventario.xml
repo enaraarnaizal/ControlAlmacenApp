@@ -19,7 +19,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_box"
-            android:contentDescription="Inventario"
+            android:contentDescription="@string/app_name"
             app:tint="#7C3AED" />
 
         <TextView
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="10dp"
-            android:text="Inventario Total"
+            android:text="@string/inventario_titulo"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#111827" />
@@ -38,7 +38,7 @@
             android:layout_height="28dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:padding="4dp"
-            android:contentDescription="Cerrar"
+            android:contentDescription="@string/close_drawer"
             app:tint="#111827" />
     </LinearLayout>
 
@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
+        android:weightSum="5"
         android:layout_marginBottom="14dp">
 
         <com.google.android.material.card.MaterialCardView
@@ -71,7 +71,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Productos"
+                    android:text="@string/total_productos"
                     android:textStyle="bold"
                     android:textColor="#4F83FF"
                     android:textSize="14sp" />
@@ -110,7 +110,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Unidades Totales"
+                    android:text="@string/unidades_totales"
                     android:textStyle="bold"
                     android:textColor="#19944D"
                     android:textSize="14sp" />
@@ -149,7 +149,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Límite Mínimo"
+                    android:text="@string/limite_minimo_label"
                     android:textStyle="bold"
                     android:textColor="#F97316"
                     android:textSize="14sp" />
@@ -163,6 +163,46 @@
                     android:textStyle="bold"
                     android:textSize="34sp"
                     android:textColor="#EA580C" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Nueva tarjeta: Sin stock -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#FEE2E2"
+            app:cardBackgroundColor="#FEE2E2">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sin_stock_label"
+                    android:textStyle="bold"
+                    android:textColor="#EF4444"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvSinStockValor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="0"
+                    android:textStyle="bold"
+                    android:textSize="34sp"
+                    android:textColor="#EF4444" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -187,7 +227,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Deshabilitados"
+                    android:text="@string/deshabilitados_label"
                     android:textStyle="bold"
                     android:textColor="#6B7280"
                     android:textSize="14sp" />
@@ -216,7 +256,7 @@
             android:id="@+id/btnFiltroTodosInventario"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="Todos"
+            android:text="@string/todos_label"
             android:textAllCaps="false"
             android:layout_marginEnd="8dp"
             app:cornerRadius="12dp" />
@@ -225,7 +265,7 @@
             android:id="@+id/btnFiltroMinimoInventario"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="Límite mínimo"
+            android:text="@string/limite_minimo_label"
             android:textAllCaps="false"
             android:layout_marginEnd="8dp"
             app:cornerRadius="12dp" />
@@ -234,7 +274,7 @@
             android:id="@+id/btnFiltroDeshabilitadosInventario"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="Deshabilitados"
+            android:text="@string/deshabilitados_label"
             android:textAllCaps="false"
             app:cornerRadius="12dp" />
     </LinearLayout>
@@ -243,7 +283,7 @@
         android:id="@+id/tvFiltroActualInventario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mostrando: inventario total"
+        android:text="@string/mostrando_inventario_total"
         android:textSize="14sp"
         android:textColor="#6B7280"
         android:layout_marginBottom="10dp" />
@@ -278,7 +318,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
-                    android:text="Producto"
+                    android:text="@string/producto_label"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="#111827" />
@@ -288,7 +328,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="Cantidad Actual"
+                    android:text="@string/cantidad_actual_label"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="#111827" />
@@ -298,7 +338,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="Cantidad Mínima"
+                    android:text="@string/cantidad_minima_label"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="#111827" />
@@ -308,7 +348,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="center"
-                    android:text="Estado"
+                    android:text="@string/estado_label"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="#111827" />
