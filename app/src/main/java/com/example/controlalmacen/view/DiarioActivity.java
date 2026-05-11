@@ -378,8 +378,10 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 if (uri != null) {
                     imagenProductoUri = uri;
                     if (imgPreviewDialog != null) {
+                        imgPreviewDialog.setAdjustViewBounds(true);
                         imgPreviewDialog.setImageURI(uri);
-                        imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);                    }
+                        imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    }
                 }
             });
 
@@ -387,8 +389,10 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             registerForActivityResult(new ActivityResultContracts.TakePicture(), success -> {
                 if (success && imagenProductoUri != null) {
                     if (imgPreviewDialog != null) {
+                        imgPreviewDialog.setAdjustViewBounds(true);
                         imgPreviewDialog.setImageURI(imagenProductoUri);
-                        imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);                    }
+                        imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    }
                 } else {
                     Toast.makeText(this, "No se pudo sacar la foto", Toast.LENGTH_SHORT).show();
                 }
@@ -774,6 +778,23 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         });
 
         dialog.show();
+
+        // Ajustar tamaño del diálogo para tablets en vertical
+        if (dialog.getWindow() != null) {
+            int screenWidth = getResources().getDisplayMetrics().widthPixels;
+            boolean isTablet = getResources().getBoolean(R.bool.is_tablet);
+            int maxWidth = getResources().getDimensionPixelSize(R.dimen.dialog_max_width);
+            if (isTablet) {
+                // aplicar un máximo más amplio en tablets y usar un porcentaje del ancho
+                int maxWidthTablet = getResources().getDimensionPixelSize(R.dimen.dialog_max_width);
+                int desired = Math.min((int) (screenWidth * 0.92f), maxWidthTablet);
+                dialog.getWindow().setLayout(desired, ViewGroup.LayoutParams.WRAP_CONTENT);
+            } else {
+                int desired = Math.min(screenWidth - (int) (24 * getResources().getDisplayMetrics().density), maxWidth);
+                dialog.getWindow().setLayout(desired, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
     }
 
 
@@ -836,14 +857,6 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 Dialog dialog = new Dialog(this);
                 dialog.setContentView(R.layout.dialog_seleccionar_producto);
 
-                if (dialog.getWindow() != null) {
-                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                    dialog.getWindow().setLayout(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                    );
-                }
-
                 TextView tvTitulo = dialog.findViewById(R.id.tvTituloSeleccion);
                 TextView tvSubtitulo = dialog.findViewById(R.id.tvSubtituloSeleccion);
                 ImageView btnCerrar = dialog.findViewById(R.id.btnCerrarSeleccion);
@@ -852,7 +865,12 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 tvTitulo.setText(titulo);
                 tvSubtitulo.setText(subtitulo);
 
-                rvProductos.setLayoutManager(new GridLayoutManager(this, 3));
+                // calcular columnas adaptativas para tablets vertical
+                int screenWidthPx = getResources().getDisplayMetrics().widthPixels;
+                float dens = getResources().getDisplayMetrics().density;
+                int approxItemDp = 180; // ancho objetivo por item en dp
+                int span = Math.max(2, screenWidthPx / (int) (approxItemDp * dens));
+                rvProductos.setLayoutManager(new GridLayoutManager(this, span));
                 rvProductos.setAdapter(new SeleccionProductoAdapter(productos, producto -> {
                     dialog.dismiss();
                     accion.onProductoSeleccionado(producto);
@@ -861,6 +879,9 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 btnCerrar.setOnClickListener(v -> dialog.dismiss());
 
                 dialog.show();
+
+                // Ajustar tamaño de forma consistente
+                ajustarAnchoDialogo(dialog);
             });
         }).start();
     }
@@ -898,14 +919,6 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 Dialog dialog = new Dialog(this);
                 dialog.setContentView(R.layout.dialog_seleccionar_producto);
 
-                if (dialog.getWindow() != null) {
-                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                    dialog.getWindow().setLayout(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                    );
-                }
-
                 TextView tvTitulo = dialog.findViewById(R.id.tvTituloSeleccion);
                 TextView tvSubtitulo = dialog.findViewById(R.id.tvSubtituloSeleccion);
                 ImageView btnCerrar = dialog.findViewById(R.id.btnCerrarSeleccion);
@@ -914,7 +927,12 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 tvTitulo.setText(titulo);
                 tvSubtitulo.setText(subtitulo);
 
-                rvProductos.setLayoutManager(new GridLayoutManager(this, 3));
+                // calcular columnas adaptativas para tablets vertical
+                int screenWidthPx = getResources().getDisplayMetrics().widthPixels;
+                float dens = getResources().getDisplayMetrics().density;
+                int approxItemDp = 180; // ancho objetivo por item en dp
+                int span = Math.max(2, screenWidthPx / (int) (approxItemDp * dens));
+                rvProductos.setLayoutManager(new GridLayoutManager(this, span));
                 rvProductos.setAdapter(new SeleccionProductoAdapter(productos, producto -> {
                     dialog.dismiss();
                     accion.onProductoSeleccionado(producto);
@@ -923,6 +941,8 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 btnCerrar.setOnClickListener(v -> dialog.dismiss());
 
                 dialog.show();
+
+                ajustarAnchoDialogo(dialog);
             });
         }).start();
     }
@@ -978,14 +998,8 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
         dialog.show();
 
-        if (dialog.getWindow() != null) {
-            int ancho = (int) (500 * getResources().getDisplayMetrics().density);
-
-            dialog.getWindow().setLayout(
-                    ancho,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-        }
+        // Ajustar ancho responsivo
+        ajustarAnchoDialogo(dialog);
     }
 
     private void abrirSeleccionBorrarProducto() {
@@ -1030,14 +1044,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
         dialog.show();
 
-        if (dialog.getWindow() != null) {
-            int ancho = (int) (500 * getResources().getDisplayMetrics().density);
-
-            dialog.getWindow().setLayout(
-                    ancho,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-        }
+        ajustarAnchoDialogo(dialog);
     }
 
     private void mostrarDialogEditarProducto(Producto producto) {
@@ -1083,12 +1090,17 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
 
         if (producto.getImg() != null && !producto.getImg().isEmpty()) {
             imagenProductoUri = Uri.parse(producto.getImg());
-            imgPreviewDialog.setImageURI(imagenProductoUri);
-            imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            if (imgPreviewDialog != null) {
+                imgPreviewDialog.setAdjustViewBounds(true);
+                imgPreviewDialog.setImageURI(imagenProductoUri);
+                imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            }
         } else {
             imagenProductoUri = null;
-            imgPreviewDialog.setImageResource(android.R.drawable.ic_menu_gallery);
-            imgPreviewDialog.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            if (imgPreviewDialog != null) {
+                imgPreviewDialog.setImageResource(android.R.drawable.ic_menu_gallery);
+                imgPreviewDialog.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            }
         }
 
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
@@ -1205,5 +1217,43 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
         });
 
         dialog.show();
+
+        // Ajustar tamaño del diálogo para tablets en vertical
+        if (dialog.getWindow() != null) {
+            int screenWidth = getResources().getDisplayMetrics().widthPixels;
+            boolean isTablet = getResources().getBoolean(R.bool.is_tablet);
+            int maxWidth = getResources().getDimensionPixelSize(R.dimen.dialog_max_width);
+            if (isTablet) {
+                int maxWidthTablet = getResources().getDimensionPixelSize(R.dimen.dialog_max_width);
+                int desired = Math.min((int) (screenWidth * 0.92f), maxWidthTablet);
+                dialog.getWindow().setLayout(desired, ViewGroup.LayoutParams.WRAP_CONTENT);
+            } else {
+                int desired = Math.min(screenWidth - (int) (24 * getResources().getDisplayMetrics().density), maxWidth);
+                dialog.getWindow().setLayout(desired, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+    }
+
+    // Helper para ajustar el ancho de diálogos de forma consistente (respeta values-sw600dp)
+    private void ajustarAnchoDialogo(Dialog dialog) {
+        if (dialog.getWindow() == null) return;
+
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        boolean isTablet = getResources().getBoolean(R.bool.is_tablet);
+        int maxWidth = getResources().getDimensionPixelSize(R.dimen.dialog_max_width);
+
+        int desired;
+        if (isTablet) {
+            // Usa un porcentaje del ancho en tablets, pero limita por dimen (values-sw600dp)
+            desired = Math.min((int) (screenWidth * 0.92f), maxWidth);
+        } else {
+            // En móviles, dejar margen y respetar maxWidth para no quedar demasiado ancho
+            int margin = (int) (24 * getResources().getDisplayMetrics().density);
+            desired = Math.min(screenWidth - margin, maxWidth);
+        }
+
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.getWindow().setLayout(desired, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 }
