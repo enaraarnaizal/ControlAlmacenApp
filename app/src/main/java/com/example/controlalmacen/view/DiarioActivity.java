@@ -719,7 +719,7 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
             if (hayError) return;
 
             int cantidad;
-            int cantidadMinTemp = 0;
+            int cantidadMinTemp = 1;
 
             try {
                 cantidad = Integer.parseInt(cantidadTxt);
@@ -865,12 +865,8 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 tvTitulo.setText(titulo);
                 tvSubtitulo.setText(subtitulo);
 
-                // calcular columnas adaptativas para tablets vertical
-                int screenWidthPx = getResources().getDisplayMetrics().widthPixels;
-                float dens = getResources().getDisplayMetrics().density;
-                int approxItemDp = 180; // ancho objetivo por item en dp
-                int span = Math.max(2, screenWidthPx / (int) (approxItemDp * dens));
-                rvProductos.setLayoutManager(new GridLayoutManager(this, span));
+                rvProductos.setLayoutManager(new GridLayoutManager(this, 4));
+
                 rvProductos.setAdapter(new SeleccionProductoAdapter(productos, producto -> {
                     dialog.dismiss();
                     accion.onProductoSeleccionado(producto);
@@ -927,12 +923,8 @@ public class DiarioActivity extends BaseActivity implements ProductoAdapter.List
                 tvTitulo.setText(titulo);
                 tvSubtitulo.setText(subtitulo);
 
-                // calcular columnas adaptativas para tablets vertical
-                int screenWidthPx = getResources().getDisplayMetrics().widthPixels;
-                float dens = getResources().getDisplayMetrics().density;
-                int approxItemDp = 180; // ancho objetivo por item en dp
-                int span = Math.max(2, screenWidthPx / (int) (approxItemDp * dens));
-                rvProductos.setLayoutManager(new GridLayoutManager(this, span));
+                rvProductos.setLayoutManager(new GridLayoutManager(this, 4));
+
                 rvProductos.setAdapter(new SeleccionProductoAdapter(productos, producto -> {
                     dialog.dismiss();
                     accion.onProductoSeleccionado(producto);

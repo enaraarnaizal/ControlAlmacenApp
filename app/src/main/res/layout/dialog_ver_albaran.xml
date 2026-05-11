@@ -30,6 +30,7 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
+
             <ImageView
                 android:id="@+id/btnCerrarDialogoX"
                 android:layout_width="22dp"
@@ -225,6 +226,17 @@
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditarAlbaran"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:layout_marginTop="18dp"
+                    android:text="Editar albarán"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="#16C55F"
+                    app:cornerRadius="12dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCerrarVer"

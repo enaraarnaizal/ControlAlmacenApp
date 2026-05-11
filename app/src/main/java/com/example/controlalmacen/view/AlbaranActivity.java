@@ -750,6 +750,7 @@ public class AlbaranActivity extends BaseActivity {
         LinearLayout layoutFechaPago = dialog.findViewById(R.id.layoutFechaPago);
         ImageView imgVerAlbaran = dialog.findViewById(R.id.imgVerAlbaran);
         MaterialButton btnCerrarVer = dialog.findViewById(R.id.btnCerrarVer);
+        MaterialButton btnEditarAlbaran = dialog.findViewById(R.id.btnEditarAlbaran);
 
         tvVerNombre.setText(albaran.getNombre());
         tvVerCif.setText(albaran.getCif());
@@ -789,7 +790,183 @@ public class AlbaranActivity extends BaseActivity {
         btnCerrarDialogoX.setOnClickListener(v -> dialog.dismiss());
         btnCerrarVer.setOnClickListener(v -> dialog.dismiss());
 
+        btnEditarAlbaran.setOnClickListener(v -> {
+            dialog.dismiss();
+            mostrarDialogEditarAlbaran(albaran);
+        });
+
         dialog.show();
+    }
+    private void mostrarDialogEditarAlbaran(Albaran albaran) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_nuevo_albaran);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
+
+        TextInputLayout tilCif = dialog.findViewById(R.id.tilCif);
+        TextInputLayout tilNombreAlbaran = dialog.findViewById(R.id.tilNombreAlbaran);
+        TextInputLayout tilImporte = dialog.findViewById(R.id.tilImporte);
+
+        TextInputEditText etCif = dialog.findViewById(R.id.etCif);
+        TextInputEditText etNombreAlbaran = dialog.findViewById(R.id.etNombreAlbaran);
+        TextInputEditText etImporte = dialog.findViewById(R.id.etImporte);
+
+        CheckBox cbPagado = dialog.findViewById(R.id.cbPagado);
+        imgPreviewDialog = dialog.findViewById(R.id.imgPreviewAlbaran);
+
+        MaterialButton btnTomarFotoAlbaran = dialog.findViewById(R.id.btnTomarFotoAlbaran);
+        MaterialButton btnSubirFotoAlbaran = dialog.findViewById(R.id.btnSubirFotoAlbaran);
+        MaterialButton btnCancelarAlbaran = dialog.findViewById(R.id.btnCancelarAlbaran);
+        MaterialButton btnGuardarAlbaran = dialog.findViewById(R.id.btnGuardarAlbaran);
+
+        btnGuardarAlbaran.setText("Guardar cambios");
+
+        etCif.setText(albaran.getCif());
+        etNombreAlbaran.setText(albaran.getNombre());
+        etImporte.setText(String.valueOf(albaran.getImporte()));
+        cbPagado.setChecked(albaran.isPagado());
+
+        if (albaran.getImagenUri() != null && !albaran.getImagenUri().isEmpty()) {
+            imagenAlbaranUri = Uri.parse(albaran.getImagenUri());
+
+            try {
+                imgPreviewDialog.setImageURI(imagenAlbaranUri);
+                imgPreviewDialog.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            } catch (Exception e) {
+                imgPreviewDialog.setImageResource(R.drawable.ic_albaran_default);
+            }
+        } else {
+            imagenAlbaranUri = null;
+            imgPreviewDialog.setImageResource(R.drawable.ic_albaran_default);
+        }
+
+        btnCancelarAlbaran.setOnClickListener(v -> dialog.dismiss());
+
+        btnTomarFotoAlbaran.setOnClickListener(v -> {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED) {
+
+                Uri uri = crearUriParaFoto();
+
+                if (uri != null) {
+                    imagenAlbaranUri = uri;
+                    camaraLauncher.launch(uri);
+                }
+
+            } else {
+                permisoCamaraLauncher.launch(Manifest.permission.CAMERA);
+            }
+        });
+
+        btnSubirFotoAlbaran.setOnClickListener(v -> galeriaLauncher.launch("image/*"));
+
+        btnGuardarAlbaran.setOnClickListener(v -> {
+            if (tilCif != null) tilCif.setError(null);
+            if (tilNombreAlbaran != null) tilNombreAlbaran.setError(null);
+            if (tilImporte != null) tilImporte.setError(null);
+
+            String cif = etCif.getText() != null ? etCif.getText().toString().trim() : "";
+            String nombre = etNombreAlbaran.getText() != null ? etNombreAlbaran.getText().toString().trim() : "";
+            String importeTxt = etImporte.getText() != null ? etImporte.getText().toString().trim() : "";
+
+            boolean hayError = false;
+
+            if (cif.isEmpty()) {
+                tilCif.setError("Introduce el CIF");
+                hayError = true;
+            }
+
+            if (nombre.isEmpty()) {
+                tilNombreAlbaran.setError("Introduce el nombre");
+                hayError = true;
+            }
+
+            if (importeTxt.isEmpty()) {
+                tilImporte.setError("Introduce el importe");
+                hayError = true;
+            }
+
+            if (imagenAlbaranUri == null) {
+                Toast.makeText(this, "Debes añadir una imagen del albarán", Toast.LENGTH_SHORT).show();
+                hayError = true;
+            }
+
+            if (hayError) return;
+
+            double importe;
+
+            try {
+                importe = Double.parseDouble(importeTxt.replace(",", "."));
+            } catch (NumberFormatException e) {
+                tilImporte.setError("El importe debe ser numérico");
+                return;
+            }
+
+            if (importe < 0) {
+                tilImporte.setError("El importe no puede ser negativo");
+                return;
+            }
+
+            final String cifFinal = cif;
+            final String nombreFinal = nombre;
+            final double importeFinal = importe;
+            final boolean pagadoFinal = cbPagado.isChecked();
+            final String imagenFinal = imagenAlbaranUri.toString();
+
+            final Long fechaPagoFinal;
+
+            if (pagadoFinal) {
+                if (albaran.isPagado() && albaran.getFechaPagoMs() != null) {
+                    fechaPagoFinal = albaran.getFechaPagoMs();
+                } else {
+                    fechaPagoFinal = System.currentTimeMillis();
+                }
+            } else {
+                fechaPagoFinal = null;
+            }
+
+            new Thread(() -> {
+                AppDatabase db = AppDatabase.getInstance(this);
+
+                albaran.setCif(cifFinal);
+                albaran.setNombre(nombreFinal);
+                albaran.setImporte(importeFinal);
+                albaran.setPagado(pagadoFinal);
+                albaran.setFechaPagoMs(fechaPagoFinal);
+                albaran.setImagenUri(imagenFinal);
+
+                db.albaranDao().update(albaran);
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Albarán actualizado correctamente", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    recargarFiltroActual();
+                });
+            }).start();
+        });
+
+        dialog.show();
+    }
+
+    private void recargarFiltroActual() {
+        if ("TODOS".equals(filtroVisualActual)) {
+            cargarAlbaranesTodos();
+        } else if ("MES".equals(filtroVisualActual)) {
+            cargarAlbaranesMesActual();
+        } else if ("SEMANA".equals(filtroVisualActual)) {
+            cargarAlbaranesSemanaActual();
+        } else if ("RANGO".equals(filtroVisualActual)
+                && fechaInicioSeleccionada > 0
+                && fechaFinSeleccionada > 0) {
+            cargarAlbaranesRango(fechaInicioSeleccionada, fechaFinSeleccionada);
+        } else {
+            cargarAlbaranesTodos();
+        }
     }
 
     private Uri crearUriParaFoto() {
