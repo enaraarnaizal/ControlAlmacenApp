@@ -79,7 +79,7 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
                 List<Usuario> listaParaAdapter = new ArrayList<>(usuariosDeBD);
 
                 if (listaParaAdapter.isEmpty()) {
-                    Usuario admin = new Usuario("Admin", null, true, "1234", "admin@mail.com", true);
+                    Usuario admin = new Usuario("Admin", null, true, "1234", "aadmin892@gmail.com", true,   "idda gkhk quir hktv");
                     long id = db.usuarioDao().insert(admin);
                     admin.setId((int) id);
                     listaParaAdapter.add(admin);
@@ -214,6 +214,9 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
         TextInputEditText etEmail = dialog.findViewById(R.id.etEmail);
         TextInputEditText etPassword = dialog.findViewById(R.id.etPassword);
 
+        TextInputLayout tilPasswordCorreo = dialog.findViewById(R.id.tilPasswordCorreo);
+        TextInputEditText etPasswordCorreo = dialog.findViewById(R.id.etPasswordCorreo);
+
         Button btnTomarFoto = dialog.findViewById(R.id.btnTomarFoto);
         Button btnSubirFoto = dialog.findViewById(R.id.btnSubirFoto);
         Button btnGuardar = dialog.findViewById(R.id.btnGuardar);
@@ -239,6 +242,10 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
                 if (usuario.getPassword() != null) {
                     etPassword.setText(usuario.getPassword());
                 }
+                if (usuario.getPasswordCorreo() != null) {
+                    etPasswordCorreo.setText(usuario.getPasswordCorreo());
+                }
+
             } else {
                 layoutAdminFields.setVisibility(View.GONE);
             }
@@ -251,10 +258,12 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
 
             tilEmail.setError(null);
             tilPassword.setError(null);
+            tilPasswordCorreo.setError(null);
 
             if (!isChecked) {
                 etEmail.setText("");
                 etPassword.setText("");
+                etPasswordCorreo.setText("");
             }
         });
 
@@ -286,6 +295,10 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
             String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
             String password = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
 
+            String passwordCorreo = etPasswordCorreo.getText() != null
+                    ? etPasswordCorreo.getText().toString().trim()
+                    : "";
+
             tilEmail.setError(null);
             tilPassword.setError(null);
 
@@ -309,6 +322,11 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
                     tilPassword.setError("Introduce la contraseña del administrador");
                     return;
                 }
+
+                if (passwordCorreo.isEmpty()) {
+                    tilPasswordCorreo.setError("Introduce la contraseña de aplicación de Gmail");
+                    return;
+                }
             }
 
             new Thread(() -> {
@@ -320,10 +338,18 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
                 if (usuario == null) {
                     String emailFinal = admin ? email : null;
                     String passwordFinal = admin ? password : null;
+                    String passwordCorreoFinal = admin ? passwordCorreo : null;
 
-                    String imagenFinal = imagenPerfilUri != null ? imagenPerfilUri.toString() : null;
+                    Usuario nuevo = new Usuario(
+                            nombre,
+                            null,
+                            admin,
+                            passwordFinal,
+                            emailFinal,
+                            true,
+                            passwordCorreoFinal
+                    );
 
-                    Usuario nuevo = new Usuario(nombre, fotoFinal, admin, passwordFinal, emailFinal, true);
                     db.usuarioDao().insert(nuevo);
 
                 } else {
@@ -337,9 +363,11 @@ public class PerfilActivity extends AppCompatActivity implements UsuarioAdminAda
                     if (admin) {
                         usuario.setEmail(email);
                         usuario.setPassword(password);
+                        usuario.setPasswordCorreo(passwordCorreo);
                     } else {
                         usuario.setEmail(null);
                         usuario.setPassword(null);
+                        usuario.setPasswordCorreo(null);
                     }
 
                     if (imagenPerfilUri != null) {

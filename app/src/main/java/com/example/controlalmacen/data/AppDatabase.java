@@ -13,7 +13,7 @@ import com.example.controlalmacen.model.Interaccion;
 import com.example.controlalmacen.model.Usuario;
 import com.example.controlalmacen.model.Producto;
 
-@Database(entities = {Usuario.class, Producto.class,  Interaccion.class, Albaran.class}, version = 3)
+@Database(entities = {Usuario.class, Producto.class,  Interaccion.class, Albaran.class}, version = 2,  exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -37,14 +37,67 @@ public abstract class AppDatabase extends RoomDatabase {
                         ProductoDao productoDao = INSTANCE.productoDao();
                         AlbaranDao albaranDao = INSTANCE.albaranDao();
 
-                        // Usuarioss iniciales
-                        usuarioDao.insert(new Usuario("Juan García", null,false,null,null,true));
-                        usuarioDao.insert(new Usuario("María López", null,false,null,null,true));
-                        usuarioDao.insert(new Usuario("Carlos Ruiz", null,false,null,null,true));
-                        usuarioDao.insert(new Usuario("Ana Martín", null,false,null,null,true));
-                        usuarioDao.insert(new Usuario("Pedro Sánchez", null,false,null,null,true));
+                        // Usuarios iniciales normales
+                        usuarioDao.insert(new Usuario(
+                                "Juan García",
+                                null,
+                                false,
+                                null,
+                                null,
+                                true,
+                                null
+                        ));
 
-                        usuarioDao.insert(new Usuario("Admin", null,true,"1234","admin@mail.com",true));
+                        usuarioDao.insert(new Usuario(
+                                "María López",
+                                null,
+                                false,
+                                null,
+                                null,
+                                true,
+                                null
+                        ));
+
+                        usuarioDao.insert(new Usuario(
+                                "Carlos Ruiz",
+                                null,
+                                false,
+                                null,
+                                null,
+                                true,
+                                null
+                        ));
+
+                        usuarioDao.insert(new Usuario(
+                                "Ana Martín",
+                                null,
+                                false,
+                                null,
+                                null,
+                                true,
+                                null
+                        ));
+
+                        usuarioDao.insert(new Usuario(
+                                "Pedro Sánchez",
+                                null,
+                                false,
+                                null,
+                                null,
+                                true,
+                                null
+                        ));
+
+                    // Usuario administrador inicial
+                        usuarioDao.insert(new Usuario(
+                                "Admin",
+                                null,
+                                true,
+                                "1234",
+                                "aadmin892@gmail.com",
+                                true,
+                                "idda gkhk quir hktv"
+                        ));
 
                         // Productos iniciales
                         productoDao.insert(new Producto("Tornillos M4", null, 500, 100, true));

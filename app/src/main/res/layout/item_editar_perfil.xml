@@ -113,6 +113,7 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -155,6 +156,22 @@
                     android:hint="Introduce la contraseña"
                     android:inputType="textPassword"
                     android:textColor="#000" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPasswordCorreo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="Contraseña aplicación Gmail">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPasswordCorreo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:singleLine="true" />
+
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>

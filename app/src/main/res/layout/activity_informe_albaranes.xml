@@ -219,6 +219,41 @@
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"/>
 
+        <TextView
+            android:id="@+id/tvEmailAdminInforme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:text="Desde: -"
+            android:textColor="#666666"
+            android:textSize="14sp" />
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEmailDestinoInforme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Email destinatario">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmailDestinoInforme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEnviarInforme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Enviar informe"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#DB4437" />
+
         <!-- Botón cerrar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCerrarInforme"

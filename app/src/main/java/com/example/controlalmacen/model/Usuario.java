@@ -17,13 +17,16 @@ public class Usuario {
     private String email;
     private boolean habilitado;
 
-    public Usuario(String nombre, String fotoUri, boolean administrador, String password, String email, boolean habilitado) {
+    private String passwordCorreo;
+
+    public Usuario(String nombre, String fotoUri, boolean administrador, String password, String email, boolean habilitado, String passwordCorreo) {
         this.nombre = nombre;
         this.fotoUri = fotoUri;
         this.administrador = administrador;
         this.password = password;
         this.email = email;
         this.habilitado = habilitado;
+        this.passwordCorreo = passwordCorreo;
     }
 
     // Getters/Setters
@@ -47,4 +50,12 @@ public class Usuario {
 
     public boolean isHabilitado() { return habilitado; }
     public void setHabilitado(boolean habilitado) { this.habilitado = habilitado; }
+
+    public String getPasswordCorreo() {
+        return passwordCorreo;
+    }
+
+    public void setPasswordCorreo(String passwordCorreo) {
+        this.passwordCorreo = passwordCorreo;
+    }
 }
