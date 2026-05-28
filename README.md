@@ -388,5 +388,7 @@ Cada interacción del usuario reinicia el tiempo de actividad.
 ###  Diagrama de Base de Datos (draw.io)  
 [![Diagrama en Draw.io](https://img.shields.io/badge/Ver_Diagrama-Draw.io-orange?logo=diagramsdotnet)](https://drive.google.com/file/d/1zFJ9oP2Sqk98xDYLeB4oXFHxZpzJpROD/view?usp=sharing)
 
+###  Testeo manual (Google Sheets)  
+[![Testeo manual en Google Sheets](https://img.shields.io/badge/Ver_Testeo-Google_Sheets-34A853?logo=googlesheets&logoColor=white)](https://docs.google.com/spreadsheets/d/11qPl-wiuNrBxovcAEhGzVfkFiQk-ToRxB4DbKtx_xmI/edit?gid=0#gid=0)
 
 ---
